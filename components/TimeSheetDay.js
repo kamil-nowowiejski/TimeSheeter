@@ -15,12 +15,23 @@ export default class TimeSheetDay extends HTMLElement {
         this._finishTimeInputCallback = callback;
     }
 
+    get isLocked() { return this._isLocked }
+    set isLocked(isLocked) { this._isLocked = isLocked }
+
+    unlockDay() {
+        this.getElementsByClassName('startTime')[0].removeAttribute('readonly');
+        this.getElementsByClassName('finishTime')[0].removeAttribute('readonly');
+        this.getElementsByClassName('locked')[0].classList.remove('locked');
+        this.getElementsByClassName('unlockButton')[0].setAttribute('hidden', true);
+    }
+
     connectedCallback() {
         this.innerHTML = `
-            <div class="column">
+            <div class="column ${this.isLocked ? 'locked' : ''}">
                 <label>${this.label}</label>
-                <input type="time" class="startTime">
-                <input type="time" class="finishTime">
+                <input type="time" class="startTime" ${this.isLocked ? 'readonly' : ''}>
+                <input type="time" class="finishTime" ${this.isLocked ? 'readonly' : ''}>
+                <input type="button" value="Unlock" class="unlockButton" ${this.isLocked ? '' : 'hidden'}/>
             </div>
 
             <style>
@@ -42,8 +53,15 @@ export default class TimeSheetDay extends HTMLElement {
                   text-align: center;
                   line-height: 50px;
               }
+
+              .locked {
+                  background-color: lightGrey
+              }
             </style>
         `;
+
+        const unlockButton = this.getElementsByClassName("unlockButton")[0];
+        unlockButton.onclick = () => this.unlockDay();
 
         if (this.startTimeInputCallback !== undefined) {
             const startTimeElem = this.getElementsByClassName("startTime")[0];

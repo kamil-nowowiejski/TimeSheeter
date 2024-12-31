@@ -32,18 +32,21 @@ export default class TimeSheetTable extends HTMLElement {
             </style>
         `;
         const container = shadow.getElementById("timeSheetContainer");
+        const currentDate = new Date();
+
         for (let i = 1; i < 6; i++) {
             const timeSheetDay = document.createElement('time-sheet-day');
-            timeSheetDay.label = this.getWeekDay(i);
+            timeSheetDay.label = this.getDayLabelText(i, currentDate);
             timeSheetDay.startTimeInputCallback = (time) => this.saveStartTime(i, time);
             timeSheetDay.finishTimeInputCallback = (time) => this.saveFinishTime(i, time);
+            timeSheetDay.isLocked = this.isPastDay(i, currentDate)
             container.appendChild(timeSheetDay);
         }
 
     }
 
-    getWeekDay(dayIndex) {
-        const dateForDayIndex = this.getDateForDayOfWeek(dayIndex);
+    getDayLabelText(dayIndex, currentDate) {
+        const dateForDayIndex = this.getDateForDayOfWeek(dayIndex, currentDate);
         const dayOfWeekLabel = this.getDayOfWeekLabel(dayIndex);
         return dayOfWeekLabel + " " + dateForDayIndex.getDate();
     }
@@ -58,16 +61,17 @@ export default class TimeSheetTable extends HTMLElement {
         }
     }
 
-    getDateForDayOfWeek(dayIndex) {
-        const currentDate = new Date();
+    getDateForDayOfWeek(dayIndex, currentDate) {
         const currentDay = currentDate.getDay();
         const dayDifference = dayIndex - currentDay;
         const timeDifference = dayDifference * 1000 * 60 * 60 * 24;
         return new Date(currentDate.getTime() + timeDifference);
     }
 
-    saveStartTime(day, time) {}
-    saveFinishTime(day, time){}
+    isPastDay(dayIndex, currentDate) { return dayIndex < currentDate.getDay() }
+
+    saveStartTime(day, time) { }
+    saveFinishTime(day, time) { }
 
 }
 
