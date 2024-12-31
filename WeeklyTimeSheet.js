@@ -1,8 +1,6 @@
-function onPageLoad() {
-    const dayTimeTemplate = document.getElementsByName("dayTimeTemplate")[0];
-    const timeSheetContainer = document.getElementsByName("timeSheetContainer")[0];
-    for(let i = 0;i < 5;i++){
-        const dayTime = dayTimeTemplate.content.cloneNode(true);
-        timeSheetContainer.appendChild(dayTime);
-    }
-}
+import TimeSheetTable from './components/TimeSheetTable.js';
+import TimeSheetDay from './components/TimeSheetDay.js';
+
+customElements.define('time-sheet-table', TimeSheetTable);
+customElements.define('time-sheet-day', TimeSheetDay)
+
