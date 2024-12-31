@@ -27,6 +27,7 @@ export default class TimeSheetTable extends HTMLElement {
                     height: 50px;
                     text-align: left;
                     line-height: 50px;
+                    margin-bottom: 10px;
                 }
             </style>
         `;
@@ -34,6 +35,8 @@ export default class TimeSheetTable extends HTMLElement {
         for (let i = 1; i < 6; i++) {
             const timeSheetDay = document.createElement('time-sheet-day');
             timeSheetDay.label = this.getWeekDay(i);
+            timeSheetDay.startTimeInputCallback = (time) => this.saveStartTime(i, time);
+            timeSheetDay.finishTimeInputCallback = (time) => this.saveFinishTime(i, time);
             container.appendChild(timeSheetDay);
         }
 
@@ -62,6 +65,10 @@ export default class TimeSheetTable extends HTMLElement {
         const timeDifference = dayDifference * 1000 * 60 * 60 * 24;
         return new Date(currentDate.getTime() + timeDifference);
     }
+
+    saveStartTime(day, time) {}
+    saveFinishTime(day, time){}
+
 }
 
 
