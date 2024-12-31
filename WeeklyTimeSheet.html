@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <link rel="stylesheet" href="styles.css">
+    <script src="WeeklyTimeSheet.js"></script>
+</head>
+
+<body onload="onPageLoad()">
+    <div name="timeSheetContainer" class="timeSheetContainer">
+        <div class="column">
+            <label>Start Time</label>
+            <label>Finish Time</label>
+        </div>
+
+        <template name="dayTimeTemplate">
+            <div class="column">
+                <input type="time">
+                <input type="time">
+            </div>
+        </template>
+    </div>
+</body>
+
+</html>
