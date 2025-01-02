@@ -30,7 +30,9 @@ export default class TimeSheetDay extends HTMLElement {
                 <input type="time" class="startTime" ${this.isLocked ? 'readonly' : ''}>
                 <input type="time" class="finishTime" ${this.isLocked ? 'readonly' : ''}>
                 <label class="workedHours">${this.getWorkedHours()}</label>
-                <input type="button" value="Unlock" class="unlockButton" ${this.isLocked ? '' : 'hidden'}/>
+                <button class="unlockButton" ${this.isLocked ? '' : 'hidden'}>
+                    <i class="fa-solid fa-lock"></i>
+                </button>
             </div>
 
             <style>
@@ -54,7 +56,21 @@ export default class TimeSheetDay extends HTMLElement {
                   flex-direction: column;
               }
               
+              .unlockButton {
+                  background-color: transparent;
+                  border: none;
+                  padding: 12px 16px;
+                  font-size: 16px;
+                  cursor: pointer;
+              }
+
               input {
+                  width: 100px;
+                  height: 50px;
+                  margin-bottom: 10px;
+              }
+
+              button {
                   width: 100px;
                   height: 50px;
                   margin-bottom: 10px;
@@ -107,7 +123,6 @@ export default class TimeSheetDay extends HTMLElement {
         const startTime = this.getStartTimeValue()
         const finishTime = this.getFinishTimeValue()
         await this.timeInputCallback?.(startTime, finishTime)
-
     }
 
     getStartTimeElement() { return this.getElementsByClassName("startTime")[0]; }
@@ -165,7 +180,7 @@ export default class TimeSheetDay extends HTMLElement {
     }
 
     isTimeValueUndefined(timeValue) { return timeValue === undefined || timeValue == '' }
-    
+
     getWorkedTime() {
         const startTime = this.startTime;
         const finishTime = this.finishTime;

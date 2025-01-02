@@ -1,14 +1,13 @@
-import { convertTimeToMinutes, timeInMinutesToString } from '../helpers/timeHelpers.js'
+import { timeInMinutesToString } from '../helpers/timeHelpers.js'
 
 export default class TimeSheetTable extends HTMLElement {
 
     constructor() {
         super();
-        this._shadow = this.attachShadow({ mode: "open" });
         this._timeSheetDays = []
     }
     connectedCallback() {
-        this._shadow.innerHTML = `
+        this.innerHTML = `
             <div>
                 <div class="flex-row" id="timeSheetContainer">
                     <div class="startFinishLabels">
@@ -46,7 +45,7 @@ export default class TimeSheetTable extends HTMLElement {
                 }
             </style>
         `;
-        const container = this._shadow.getElementById("timeSheetContainer");
+        const container = this.querySelector("#timeSheetContainer");
         const currentDate = new Date();
 
         for (let i = 1; i < 6; i++) {
@@ -130,11 +129,11 @@ export default class TimeSheetTable extends HTMLElement {
         const fullWeekWorkTime = 40 * 60;
         const remainingTimeMinutes = fullWeekWorkTime - allWorkedTime;
 
-        const remainingTimeLabel = this._shadow.querySelector('.remainingTime')
+        const remainingTimeLabel = this.querySelector('.remainingTime')
         remainingTimeLabel.textContent = "Remaining time: " + timeInMinutesToString(remainingTimeMinutes)
     }
 
-    getErrorsElement() { return this._shadow.getElementById('errors') }
+    getErrorsElement() { return this.querySelector('#errors') }
 
 }
 
