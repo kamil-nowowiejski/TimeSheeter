@@ -181,7 +181,7 @@ export default class TimeSheetDay extends HTMLElement {
         const finishTime = this.finishTime;
         if (this.isTimeValueUndefined(startTime) || this.isTimeValueUndefined(finishTime))
             return 0;
-        return convertTimeToMinutes(startTime) + convertTimeToMinutes(finishTime)
+        return convertTimeToMinutes(finishTime) - convertTimeToMinutes(startTime)
     }
 }
 
