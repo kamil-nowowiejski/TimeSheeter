@@ -19,10 +19,25 @@ export default class TimeSheetDay extends HTMLElement {
     set isLocked(isLocked) { this._isLocked = isLocked }
 
     unlockDay() {
-        this.getElementsByClassName('startTime')[0].removeAttribute('readonly');
-        this.getElementsByClassName('finishTime')[0].removeAttribute('readonly');
+        this.getStartTimeElement().removeAttribute('readonly');
+        this.getFinishTimeElement().removeAttribute('readonly');
         this.getElementsByClassName('locked')[0].classList.remove('locked');
-        this.getElementsByClassName('unlockButton')[0].setAttribute('hidden', true);
+        this.getUnlockButtonElement().setAttribute('hidden', true);
+    }
+
+    getWorkedHours() {
+        const startTime = this.getStartTimeValue()
+        const finishTime = this.getFinishTimeValue()
+
+        if (startTime === undefined || startTime == '' || finishTime === undefined || finishTime == '')
+            return '-';
+
+        const startTimeMinutes = this.convertTimeToMinutes(startTime);
+        const finishTimeMinutes = this.convertTimeToMinutes(finishTime);
+        const workTimeMinutes = finishTimeMinutes - startTimeMinutes;
+        const workHours = Math.floor(workTimeMinutes / 60)
+        const workMinutes = workTimeMinutes - workHours * 60
+        return workHours + ":" + workMinutes;
     }
 
     connectedCallback() {
@@ -31,6 +46,7 @@ export default class TimeSheetDay extends HTMLElement {
                 <label>${this.label}</label>
                 <input type="time" class="startTime" ${this.isLocked ? 'readonly' : ''}>
                 <input type="time" class="finishTime" ${this.isLocked ? 'readonly' : ''}>
+                <label class="workedHours">${this.getWorkedHours()}</label>
                 <input type="button" value="Unlock" class="unlockButton" ${this.isLocked ? '' : 'hidden'}/>
             </div>
 
@@ -60,20 +76,37 @@ export default class TimeSheetDay extends HTMLElement {
             </style>
         `;
 
-        const unlockButton = this.getElementsByClassName("unlockButton")[0];
-        unlockButton.onclick = () => this.unlockDay();
+        this.getUnlockButtonElement().onclick = () => this.unlockDay();
+        this.getStartTimeElement().addEventListener("input", async () => await this.onStartTimeInput());
+        this.getFinishTimeElement().addEventListener("input", async () => await this.onFinishTimeInput());
+    }
 
-        if (this.startTimeInputCallback !== undefined) {
-            const startTimeElem = this.getElementsByClassName("startTime")[0];
-            startTimeElem.addEventListener("input",
-                async () => await this.startTimeInputCallback(startTimeElem.value));
-        }
+    async onStartTimeInput() {
+        this.refreshWorkedHours()
+        await this.startTimeInputCallback?.(this.getStartTimeValue())
+    }
 
-        if (this.finishTimeInputCallback !== undefined) {
-            const finishTimeElem = this.getElementsByClassName("finishTime")[0];
-            finishTimeElem.addEventListener("input",
-                async () => await this.finishTimeInputCallback(finishTimeElem.value));
-        }
+    async onFinishTimeInput() {
+        this.refreshWorkedHours()
+        await this.finishTimeInputCallback?.(this.getFinishTimeValue())
+    }
+
+    getStartTimeElement() { return this.getElementsByClassName("startTime")[0]; }
+    getFinishTimeElement() { return this.getElementsByClassName("finishTime")[0]; }
+    getStartTimeValue() { return this.getStartTimeElement()?.value; }
+    getFinishTimeValue() { return this.getFinishTimeElement()?.value; }
+    getUnlockButtonElement() { return this.getElementsByClassName("unlockButton")[0] }
+    refreshWorkedHours() {
+        const element = this.getElementsByClassName("workedHours")[0]
+        element.textContent = this.getWorkedHours()
+    }
+
+    convertTimeToMinutes(stringTime) {
+        const split = stringTime.split(':');
+        const hours = parseInt(split[0])
+        const minutes = parseInt(split[1])
+        return hours * 60 + minutes;
+        
     }
 }
 

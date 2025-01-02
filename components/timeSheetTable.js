@@ -7,6 +7,7 @@ export default class TimeSheetTable extends HTMLElement {
                 <div class="startFinishLabels">
                     <label class="timeLabel">Start Time</label>
                     <label class="timeLabel">Finish Time</label>
+                    <label class="hoursWorked">Hours Worked</label>
                 </div>
             </div>
             
