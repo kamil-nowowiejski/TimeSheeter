@@ -26,13 +26,12 @@ export default class TimeSheetDay extends HTMLElement {
     connectedCallback() {
         this.innerHTML = `
             <div class="column masterContainer ${this.isLocked ? 'locked' : ''}">
-                <label>${this.label}</label>
+                <label class="dayLabel">${this.label}
+                    <i class="padlockIcon fa-solid fa-lock" style="${this.isLocked ? '' : 'display: none'}"></i>
+                </label>
                 <input type="time" class="startTime" ${this.isLocked ? 'readonly' : ''}>
                 <input type="time" class="finishTime" ${this.isLocked ? 'readonly' : ''}>
                 <label class="workedHours">${this.getWorkedHours()}</label>
-                <button class="unlockButton" ${this.isLocked ? '' : 'hidden'}>
-                    <i class="fa-solid fa-lock"></i>
-                </button>
             </div>
 
             <style>
@@ -41,7 +40,7 @@ export default class TimeSheetDay extends HTMLElement {
               } 
 
               .masterContainer.locked {
-                  background-color: lightGrey
+                  background-color: lightGrey;
               }
               
               .masterContainer.valid {
@@ -55,27 +54,17 @@ export default class TimeSheetDay extends HTMLElement {
                   display: flex;
                   flex-direction: column;
               }
-              
-              .unlockButton {
-                  background-color: transparent;
-                  border: none;
-                  padding: 12px 16px;
-                  font-size: 16px;
-                  cursor: pointer;
-              }
 
+              .padlockIcon {
+                  cursor: pointer
+              }
+              
               input {
                   width: 100px;
                   height: 50px;
                   margin-bottom: 10px;
               }
 
-              button {
-                  width: 100px;
-                  height: 50px;
-                  margin-bottom: 10px;
-              }
-              
               label {
                   width: 100px;
                   height: 50px;
@@ -85,16 +74,21 @@ export default class TimeSheetDay extends HTMLElement {
             </style>
         `;
 
-        this.getUnlockButtonElement().onclick = () => this.unlockDay();
+        this.getPadlockIconElement().onclick = () => this.unlockDay();
         this.getStartTimeElement().addEventListener("input", async () => await this.onTimeInput());
         this.getFinishTimeElement().addEventListener("input", async () => await this.onTimeInput());
     }
 
     unlockDay() {
-        this.getStartTimeElement().removeAttribute('readonly');
-        this.getFinishTimeElement().removeAttribute('readonly');
-        this.getElementsByClassName('locked')[0].classList.remove('locked');
-        this.getUnlockButtonElement().setAttribute('hidden', true);
+        const masterContainer = this.getMasterContainer();
+        if (masterContainer.classList.contains('locked')) {
+            this.getStartTimeElement().removeAttribute('readonly');
+            this.getFinishTimeElement().removeAttribute('readonly');
+            this.getElementsByClassName('locked')[0].classList.remove('locked');
+            const dayLabel = this.getElementsByClassName('dayLabel')[0]
+            const padlockIcon = dayLabel.children[0]
+            dayLabel.removeChild(padlockIcon)
+        }
     }
 
     getWorkedHours() {
@@ -129,8 +123,9 @@ export default class TimeSheetDay extends HTMLElement {
     getFinishTimeElement() { return this.getElementsByClassName("finishTime")[0]; }
     getStartTimeValue() { return this.getStartTimeElement()?.value; }
     getFinishTimeValue() { return this.getFinishTimeElement()?.value; }
+    getMasterContainer() { return this.getElementsByClassName('masterContainer')[0] }
+    getPadlockIconElement() { return this.getElementsByClassName('padlockIcon')[0] }
     unifyTimeValue(rawValue) { return this.isTimeValueUndefined(rawValue) ? undefined : rawValue }
-    getUnlockButtonElement() { return this.getElementsByClassName("unlockButton")[0] }
     refreshWorkedHours() {
         const element = this.getElementsByClassName("workedHours")[0]
         element.textContent = this.getWorkedHours()
