@@ -1,8 +1,11 @@
+import { convertTimeToMinutes, timeInMinutesToString } from '../helpers/timeHelpers.js'
+
 export default class TimeSheetTable extends HTMLElement {
 
     constructor() {
         super();
         this._shadow = this.attachShadow({ mode: "open" });
+        this._timeSheetDays = []
     }
     connectedCallback() {
         this._shadow.innerHTML = `
@@ -14,6 +17,7 @@ export default class TimeSheetTable extends HTMLElement {
                         <label class="hoursWorked">Hours Worked</label>
                     </div>
                 </div>
+                <label class='remainingTime'></label>
                 <div id="errors"></div>
             </div>
             
@@ -48,13 +52,15 @@ export default class TimeSheetTable extends HTMLElement {
         for (let i = 1; i < 6; i++) {
             const timeSheetDay = document.createElement('time-sheet-day');
             timeSheetDay.label = this.getDayLabelText(i, currentDate);
-            timeSheetDay.timeInputCallback = (startTime, finishTime) => this.saveTime(i, startTime, finishTime);
+            timeSheetDay.timeInputCallback = (startTime, finishTime) => this.onDayTimeInput(i, startTime, finishTime);
             timeSheetDay.errorCallback = (error) => this.showErrorForDay(i, error)
             timeSheetDay.errorClearedCallback = () => this.removeErrorForDay(i);
             timeSheetDay.isLocked = this.isPastDay(i, currentDate)
             container.appendChild(timeSheetDay);
+            this._timeSheetDays.push(timeSheetDay)
         }
 
+        this.updateRemainingTime()
     }
 
     getDayLabelText(dayIndex, currentDate) {
@@ -110,7 +116,24 @@ export default class TimeSheetTable extends HTMLElement {
             errorsElement.removeChild(existingError);
     }
 
-    saveTime(day, startTime, finishTime) { }
+    async onDayTimeInput(dayIndex, startTime, finishTime) {
+        this.updateRemainingTime();
+        await this.saveTime(dayIndex, startTime, finishTime)
+    }
+
+    async saveTime(day, startTime, finishTime) { }
+
+    updateRemainingTime() {
+        const allWorkedTime = this._timeSheetDays
+            .map(day => day.workedTime)
+            .reduce((allTime, dayTime) => allTime + dayTime, 0)
+        const fullWeekWorkTime = 40 * 60;
+        const remainingTimeMinutes = fullWeekWorkTime - allWorkedTime;
+
+        const remainingTimeLabel = this._shadow.querySelector('.remainingTime')
+        remainingTimeLabel.textContent = "Remaining time: " + timeInMinutesToString(remainingTimeMinutes)
+    }
+
     getErrorsElement() { return this._shadow.getElementById('errors') }
 
 }

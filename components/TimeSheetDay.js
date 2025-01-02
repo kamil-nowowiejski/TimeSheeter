@@ -1,6 +1,12 @@
+import { convertTimeToMinutes, timeInMinutesToString } from '../helpers/timeHelpers.js'
+
 export default class TimeSheetDay extends HTMLElement {
 
     constructor() { super(); }
+
+    get startTime() { return this.getStartTimeValue() }
+    get finishTime() { return this.getFinishTimeValue() }
+    get workedTime() { return this.getWorkedTime() }
 
     get label() { return this._label; }
     set label(text) { this._label = text; }
@@ -33,7 +39,6 @@ export default class TimeSheetDay extends HTMLElement {
               } 
 
               .masterContainer.locked {
-
                   background-color: lightGrey
               }
               
@@ -83,28 +88,25 @@ export default class TimeSheetDay extends HTMLElement {
         if (this.isTimeValueUndefined(startTime) || this.isTimeValueUndefined(finishTime))
             return '-';
 
-        const startTimeMinutes = this.convertTimeToMinutes(startTime);
-        const finishTimeMinutes = this.convertTimeToMinutes(finishTime);
+        const startTimeMinutes = convertTimeToMinutes(startTime);
+        const finishTimeMinutes = convertTimeToMinutes(finishTime);
 
         if (finishTimeMinutes <= startTimeMinutes)
             return '-'
 
         const workTimeMinutes = finishTimeMinutes - startTimeMinutes;
-        const workHours = Math.floor(workTimeMinutes / 60)
-        const workMinutes = workTimeMinutes - workHours * 60
-        return workHours + ":" + workMinutes;
+        return timeInMinutesToString(workTimeMinutes);
     }
 
     async onTimeInput() {
+        this.refreshWorkedHours()
 
         if (this.validateTimeInput() == false)
             return;
 
-        this.refreshWorkedHours()
-
         const startTime = this.getStartTimeValue()
         const finishTime = this.getFinishTimeValue()
-        await this.finishTimeInputCallback?.(startTime, finishTime)
+        await this.timeInputCallback?.(startTime, finishTime)
 
     }
 
@@ -119,14 +121,6 @@ export default class TimeSheetDay extends HTMLElement {
         element.textContent = this.getWorkedHours()
     }
 
-    convertTimeToMinutes(stringTime) {
-        const split = stringTime.split(':');
-        const hours = parseInt(split[0])
-        const minutes = parseInt(split[1])
-        return hours * 60 + minutes;
-
-    }
-
     validateTimeInput() {
         const startTime = this.getStartTimeValue();
         const finishTime = this.getFinishTimeValue();
@@ -135,12 +129,15 @@ export default class TimeSheetDay extends HTMLElement {
             return true;
         }
 
-        const startTimeMinutes = this.convertTimeToMinutes(startTime)
-        const finishTimeMinutes = this.convertTimeToMinutes(finishTime)
+        const startTimeMinutes = convertTimeToMinutes(startTime)
+        const finishTimeMinutes = convertTimeToMinutes(finishTime)
         if (finishTimeMinutes <= startTimeMinutes) {
             this.setErrorInValidationContainer('Finish time must be greater than start time')
             return false;
         }
+
+        this.resetValidationContainer();
+        return true
     }
 
     resetValidationContainer() {
@@ -168,5 +165,13 @@ export default class TimeSheetDay extends HTMLElement {
     }
 
     isTimeValueUndefined(timeValue) { return timeValue === undefined || timeValue == '' }
+    
+    getWorkedTime() {
+        const startTime = this.startTime;
+        const finishTime = this.finishTime;
+        if (this.isTimeValueUndefined(startTime) || this.isTimeValueUndefined(finishTime))
+            return 0;
+        return convertTimeToMinutes(startTime) + convertTimeToMinutes(finishTime)
+    }
 }
 
