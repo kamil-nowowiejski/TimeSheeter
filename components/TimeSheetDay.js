@@ -5,18 +5,65 @@ export default class TimeSheetDay extends HTMLElement {
     get label() { return this._label; }
     set label(text) { this._label = text; }
 
-    get startTimeInputCallback() { return this._startTimeInputCallback }
-    set startTimeInputCallback(callback) {
-        this._startTimeInputCallback = callback
-    }
-
-    get finishTimeInputCallback() { return this._finishTimeInputCallback }
-    set finishTimeInputCallback(callback) {
-        this._finishTimeInputCallback = callback;
-    }
+    get timeInputCallback() { return this._timeInputCallback }
+    set timeInputCallback(callback) { this._timeInputCallback = callback }
 
     get isLocked() { return this._isLocked }
     set isLocked(isLocked) { this._isLocked = isLocked }
+
+    connectedCallback() {
+        this.innerHTML = `
+            <div class="masterContainer column ${this.isLocked ? 'locked' : ''}">
+                <label>${this.label}</label>
+                <div class="column timeValidationContainer valid">
+                    <input type="time" class="startTime" ${this.isLocked ? 'readonly' : ''}>
+                    <input type="time" class="finishTime" ${this.isLocked ? 'readonly' : ''}>
+                </div>
+                <label class="workedHours">${this.getWorkedHours()}</label>
+                <input type="button" value="Unlock" class="unlockButton" ${this.isLocked ? '' : 'hidden'}/>
+            </div>
+
+            <style>
+              .masterContainer {
+                  margin-left: 20px;
+              }
+              
+              .column {
+                  display: flex;
+                  flex-direction: column;
+              }
+              
+              input {
+                  width: 100px;
+                  height: 50px;
+                  margin-bottom: 10px;
+              }
+              
+              label {
+                  width: 100px;
+                  height: 50px;
+                  text-align: center;
+                  line-height: 50px;
+              }
+
+              .locked {
+                  background-color: lightGrey
+              }
+
+              .timeValidationContainer.valid {
+                  background-color: transparent
+              }
+
+              .timeValidationContainer.invalid {
+                  background-color: red
+              }
+            </style>
+        `;
+
+        this.getUnlockButtonElement().onclick = () => this.unlockDay();
+        this.getStartTimeElement().addEventListener("input", async () => await this.onTimeInput());
+        this.getFinishTimeElement().addEventListener("input", async () => await this.onTimeInput());
+    }
 
     unlockDay() {
         this.getStartTimeElement().removeAttribute('readonly');
@@ -29,72 +76,39 @@ export default class TimeSheetDay extends HTMLElement {
         const startTime = this.getStartTimeValue()
         const finishTime = this.getFinishTimeValue()
 
-        if (startTime === undefined || startTime == '' || finishTime === undefined || finishTime == '')
+        if (this.isTimeValueUndefined(startTime) || this.isTimeValueUndefined(finishTime))
             return '-';
 
         const startTimeMinutes = this.convertTimeToMinutes(startTime);
         const finishTimeMinutes = this.convertTimeToMinutes(finishTime);
+
+        if (finishTimeMinutes <= startTimeMinutes)
+            return '-'
+
         const workTimeMinutes = finishTimeMinutes - startTimeMinutes;
         const workHours = Math.floor(workTimeMinutes / 60)
         const workMinutes = workTimeMinutes - workHours * 60
         return workHours + ":" + workMinutes;
     }
 
-    connectedCallback() {
-        this.innerHTML = `
-            <div class="column ${this.isLocked ? 'locked' : ''}">
-                <label>${this.label}</label>
-                <input type="time" class="startTime" ${this.isLocked ? 'readonly' : ''}>
-                <input type="time" class="finishTime" ${this.isLocked ? 'readonly' : ''}>
-                <label class="workedHours">${this.getWorkedHours()}</label>
-                <input type="button" value="Unlock" class="unlockButton" ${this.isLocked ? '' : 'hidden'}/>
-            </div>
+    async onTimeInput() {
 
-            <style>
-              .column {
-                  display: flex;
-                  flex-direction: column;
-                  margin-left: 20px;
-              }
-              
-              .column > input {
-                  width: 100px;
-                  height: 50px;
-                  margin-bottom: 10px;
-              }
-              
-              .column > label {
-                  width: 100px;
-                  height: 50px;
-                  text-align: center;
-                  line-height: 50px;
-              }
+        if (this.validateTimeInput() == false)
+            return;
 
-              .locked {
-                  background-color: lightGrey
-              }
-            </style>
-        `;
-
-        this.getUnlockButtonElement().onclick = () => this.unlockDay();
-        this.getStartTimeElement().addEventListener("input", async () => await this.onStartTimeInput());
-        this.getFinishTimeElement().addEventListener("input", async () => await this.onFinishTimeInput());
-    }
-
-    async onStartTimeInput() {
         this.refreshWorkedHours()
-        await this.startTimeInputCallback?.(this.getStartTimeValue())
-    }
 
-    async onFinishTimeInput() {
-        this.refreshWorkedHours()
-        await this.finishTimeInputCallback?.(this.getFinishTimeValue())
+        const startTime = this.getStartTimeValue()
+        const finishTime = this.getFinishTimeValue()
+        await this.finishTimeInputCallback?.(startTime, finishTime)
+
     }
 
     getStartTimeElement() { return this.getElementsByClassName("startTime")[0]; }
     getFinishTimeElement() { return this.getElementsByClassName("finishTime")[0]; }
     getStartTimeValue() { return this.getStartTimeElement()?.value; }
     getFinishTimeValue() { return this.getFinishTimeElement()?.value; }
+    unifyTimeValue(rawValue) { return this.isTimeValueUndefined(rawValue) ? undefined : rawValue }
     getUnlockButtonElement() { return this.getElementsByClassName("unlockButton")[0] }
     refreshWorkedHours() {
         const element = this.getElementsByClassName("workedHours")[0]
@@ -106,7 +120,46 @@ export default class TimeSheetDay extends HTMLElement {
         const hours = parseInt(split[0])
         const minutes = parseInt(split[1])
         return hours * 60 + minutes;
-        
+
     }
+
+    validateTimeInput() {
+        const startTime = this.getStartTimeValue();
+        const finishTime = this.getFinishTimeValue();
+        if (this.isTimeValueUndefined(startTime) || this.isTimeValueUndefined(finishTime)) {
+            this.resetValidationContainer();
+            return true;
+        }
+
+        const startTimeMinutes = this.convertTimeToMinutes(startTime)
+        const finishTimeMinutes = this.convertTimeToMinutes(finishTime)
+        if (finishTimeMinutes <= startTimeMinutes) {
+            this.setErrorInValidationContainer('Finish time must be greater than start time')
+            return false;
+        }
+    }
+
+    resetValidationContainer() {
+        const validationContainer = this.getElementsByClassName("timeValidationContainer")[0];
+
+        if (validationContainer.classList.contains('invalid'))
+            validationContainer.classList.remove('invalid')
+
+        if (validationContainer.classList.contains('valid') == false)
+            validationContainer.classList.add('valid');
+    }
+
+    setErrorInValidationContainer(error) {
+        const validationContainer = this.getElementsByClassName("timeValidationContainer")[0];
+
+        if (validationContainer.classList.contains('valid'))
+            validationContainer.classList.remove('valid');
+
+        if(validationContainer.classList.contains('invalid') == false)
+            validationContainer.classList.add('invalid')
+
+    }
+
+    isTimeValueUndefined(timeValue) { return timeValue === undefined || timeValue == '' }
 }
 

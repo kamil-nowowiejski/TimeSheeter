@@ -38,8 +38,7 @@ export default class TimeSheetTable extends HTMLElement {
         for (let i = 1; i < 6; i++) {
             const timeSheetDay = document.createElement('time-sheet-day');
             timeSheetDay.label = this.getDayLabelText(i, currentDate);
-            timeSheetDay.startTimeInputCallback = (time) => this.saveStartTime(i, time);
-            timeSheetDay.finishTimeInputCallback = (time) => this.saveFinishTime(i, time);
+            timeSheetDay.timeInputCallback = (startTime, finishTime) => this.saveTime(i, startTime, finishTime);
             timeSheetDay.isLocked = this.isPastDay(i, currentDate)
             container.appendChild(timeSheetDay);
         }
@@ -71,8 +70,7 @@ export default class TimeSheetTable extends HTMLElement {
 
     isPastDay(dayIndex, currentDate) { return dayIndex < currentDate.getDay() }
 
-    saveStartTime(day, time) { }
-    saveFinishTime(day, time) { }
+    saveTime(day, startTime, finishTime) { }
 
 }
 
