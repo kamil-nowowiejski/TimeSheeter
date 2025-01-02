@@ -8,17 +8,21 @@ export default class TimeSheetDay extends HTMLElement {
     get timeInputCallback() { return this._timeInputCallback }
     set timeInputCallback(callback) { this._timeInputCallback = callback }
 
+    get errorCallback() { return this._errorCallback }
+    set errorCallback(callback) { this._errorCallback = callback }
+
+    get errorClearedCallback() { return this._errorClearedCallback }
+    set errorClearedCallback(callback) { this._errorClearedCallback = callback }
+
     get isLocked() { return this._isLocked }
     set isLocked(isLocked) { this._isLocked = isLocked }
 
     connectedCallback() {
         this.innerHTML = `
-            <div class="masterContainer column ${this.isLocked ? 'locked' : ''}">
+            <div class="column masterContainer ${this.isLocked ? 'locked' : ''}">
                 <label>${this.label}</label>
-                <div class="column timeValidationContainer valid">
-                    <input type="time" class="startTime" ${this.isLocked ? 'readonly' : ''}>
-                    <input type="time" class="finishTime" ${this.isLocked ? 'readonly' : ''}>
-                </div>
+                <input type="time" class="startTime" ${this.isLocked ? 'readonly' : ''}>
+                <input type="time" class="finishTime" ${this.isLocked ? 'readonly' : ''}>
                 <label class="workedHours">${this.getWorkedHours()}</label>
                 <input type="button" value="Unlock" class="unlockButton" ${this.isLocked ? '' : 'hidden'}/>
             </div>
@@ -26,8 +30,20 @@ export default class TimeSheetDay extends HTMLElement {
             <style>
               .masterContainer {
                   margin-left: 20px;
+              } 
+
+              .masterContainer.locked {
+
+                  background-color: lightGrey
               }
               
+              .masterContainer.valid {
+                  background-color: transparent
+              }
+
+              .masterContainer.invalid {
+                  background-color: lightCoral
+              }
               .column {
                   display: flex;
                   flex-direction: column;
@@ -44,18 +60,6 @@ export default class TimeSheetDay extends HTMLElement {
                   height: 50px;
                   text-align: center;
                   line-height: 50px;
-              }
-
-              .locked {
-                  background-color: lightGrey
-              }
-
-              .timeValidationContainer.valid {
-                  background-color: transparent
-              }
-
-              .timeValidationContainer.invalid {
-                  background-color: red
               }
             </style>
         `;
@@ -140,24 +144,27 @@ export default class TimeSheetDay extends HTMLElement {
     }
 
     resetValidationContainer() {
-        const validationContainer = this.getElementsByClassName("timeValidationContainer")[0];
+        const validationContainer = this.getElementsByClassName("masterContainer")[0];
 
         if (validationContainer.classList.contains('invalid'))
             validationContainer.classList.remove('invalid')
 
         if (validationContainer.classList.contains('valid') == false)
             validationContainer.classList.add('valid');
+
+        this.errorClearedCallback?.()
     }
 
     setErrorInValidationContainer(error) {
-        const validationContainer = this.getElementsByClassName("timeValidationContainer")[0];
+        const validationContainer = this.getElementsByClassName("masterContainer")[0];
 
         if (validationContainer.classList.contains('valid'))
             validationContainer.classList.remove('valid');
 
-        if(validationContainer.classList.contains('invalid') == false)
+        if (validationContainer.classList.contains('invalid') == false)
             validationContainer.classList.add('invalid')
 
+        this.errorCallback?.(error)
     }
 
     isTimeValueUndefined(timeValue) { return timeValue === undefined || timeValue == '' }
