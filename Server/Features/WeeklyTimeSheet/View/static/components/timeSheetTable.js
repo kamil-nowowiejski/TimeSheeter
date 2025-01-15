@@ -6,7 +6,7 @@ export default class TimeSheetTable extends HTMLElement {
         super();
         this._timeSheetDays = []
     }
-    connectedCallback() {
+    async connectedCallback() {
         this.innerHTML = `
             <div>
                 <div class="flex-row" id="timeSheetContainer">
@@ -45,21 +45,25 @@ export default class TimeSheetTable extends HTMLElement {
                 }
             </style>
         `;
-        const container = this.querySelector("#timeSheetContainer");
-        const currentDate = new Date();
+        fetch('weeklytimesheet/getcurrentweektime')
+            .then(response => function() {
+                console.log(response)
+                const container = this.querySelector("#timeSheetContainer");
+                const currentDate = new Date();
 
-        for (let i = 1; i < 6; i++) {
-            const timeSheetDay = document.createElement('time-sheet-day');
-            timeSheetDay.label = this.getDayLabelText(i, currentDate);
-            timeSheetDay.timeInputCallback = (startTime, finishTime) => this.onDayTimeInput(i, startTime, finishTime);
-            timeSheetDay.errorCallback = (error) => this.showErrorForDay(i, error)
-            timeSheetDay.errorClearedCallback = () => this.removeErrorForDay(i);
-            timeSheetDay.isLocked = this.isPastDay(i, currentDate)
-            container.appendChild(timeSheetDay);
-            this._timeSheetDays.push(timeSheetDay)
-        }
+                for (let i = 1; i < 6; i++) {
+                    const timeSheetDay = document.createElement('time-sheet-day');
+                    timeSheetDay.label = this.getDayLabelText(i, currentDate);
+                    timeSheetDay.timeInputCallback = (startTime, finishTime) => this.onDayTimeInput(i, startTime, finishTime);
+                    timeSheetDay.errorCallback = (error) => this.showErrorForDay(i, error)
+                    timeSheetDay.errorClearedCallback = () => this.removeErrorForDay(i);
+                    timeSheetDay.isLocked = this.isPastDay(i, currentDate)
+                    container.appendChild(timeSheetDay);
+                    this._timeSheetDays.push(timeSheetDay)
+                }
 
-        this.updateRemainingTime()
+                this.updateRemainingTime()
+            })
     }
 
     getDayLabelText(dayIndex, currentDate) {
@@ -120,7 +124,37 @@ export default class TimeSheetTable extends HTMLElement {
         await this.saveTime(dayIndex, startTime, finishTime)
     }
 
-    async saveTime(day, startTime, finishTime) { }
+    async saveTime(day, startTime, finishTime) {
+        const body = {
+            statTime: this.toDateTime(day, startTime),
+            finishTime: this.toDateTime(day, finishTime)
+        }
+
+        const params = {
+            headers: { "content-type": "application/json" },
+            method: "POST",
+            body: JSON.stringify(body)
+        }
+
+        await fetch('/weeklytimesheet/savetime', params)
+            .catch(error => console.log(error))
+    }
+
+    toDateTime(day, time) {
+        if (time === undefined || time === '')
+            return undefined;
+
+        const currentDay = new Date()
+        const dateForDay = this.getDateForDayOfWeek(day, currentDay)
+        const timeSplit = time.split(':')
+        const hour = parseInt(timeSplit[0])
+        const minutes = parseInt(timeSplit[1])
+        const timeZoneOffsetInMinutes = currentDay.getTimezoneOffset()
+        const timeInMinutes = hour * 60 + minutes + timeZoneOffsetInMinutes
+        const timeInMilliseconds = timeInMinutes * 1000
+        const date = new Date(dateForDay.getTime() + timeInMilliseconds)
+        return date.toISOString()
+    }
 
     updateRemainingTime() {
         const allWorkedTime = this._timeSheetDays

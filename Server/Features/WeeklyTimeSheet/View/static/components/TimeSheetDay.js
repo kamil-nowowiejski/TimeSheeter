@@ -5,7 +5,9 @@ export default class TimeSheetDay extends HTMLElement {
     constructor() { super(); }
 
     get startTime() { return this.getStartTimeValue() }
+    set startTime(value) { this.getStartTimeElement().value = value }
     get finishTime() { return this.getFinishTimeValue() }
+    set finishTime(value) { this.getFinishTimeElement().value = value }
     get workedTime() { return this.getWorkedTime() }
 
     get label() { return this._label; }
