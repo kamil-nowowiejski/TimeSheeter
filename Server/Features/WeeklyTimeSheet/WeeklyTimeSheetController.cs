@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Server.Database;
 using Server.Features.WeeklyTimeSheet.Dtos;
 
@@ -50,9 +51,38 @@ public class WeeklyTimeSheetController : Controller
     /// Time is returned in UTC.
     /// </summary>
     [HttpGet]
-    public  Task<ActionResult<WeekTimeGetDto>> GetCurrentWeekTime()
-    { 
-        throw new NotImplementedException();
+    public async Task<ActionResult<WeekTimeGetDto>> GetCurrentWeekTime()
+    {
+        var currentDate = _currentDateProvider.GetCurrentDate();
+        var daysToGoBack = currentDate.DayOfWeek == DayOfWeek.Sunday ? 6 : (int)currentDate.DayOfWeek - 1;
+        var mondayDate = currentDate - TimeSpan.FromDays(daysToGoBack);
+        var fridayDate = mondayDate + TimeSpan.FromDays(5);
+
+        var workDays = await _dbContext.WorkDay
+            .Where(w => w.Date >= mondayDate && w.Date <= fridayDate)
+            .ToListAsync();
+        
+        return new WeekTimeGetDto()
+        {
+            Monday = GetTimeDto(0), 
+            Tuesday = GetTimeDto(1), 
+            Wendsday = GetTimeDto(2),
+            Thrusday = GetTimeDto(3), 
+            Friday = GetTimeDto(4)
+        };
+         
+        TimeDto GetTimeDto(int index)
+        {
+            if(index >= workDays.Count())
+                return new() { Date = mondayDate + TimeSpan.FromDays(index) };
+                
+            return new()
+            {
+                Date = workDays[index].Date, 
+                StartTime = workDays[index].StartTime,
+                FinishTime = workDays[index].FinishTime
+            };
+        }
     }
 
 }
