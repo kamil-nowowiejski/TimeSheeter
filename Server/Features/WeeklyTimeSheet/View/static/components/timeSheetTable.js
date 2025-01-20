@@ -45,13 +45,15 @@ export default class TimeSheetTable extends HTMLElement {
                 }
             </style>
         `;
-        fetch('weeklytimesheet/getcurrentweektime')
-            .then(response => function() {
-                console.log(response)
+        await fetch('weeklytimesheet/getcurrentweektime')
+            .then(response => response.text())
+            .then(json => JSON.parse(json))
+            .then(weekTime => {
                 const container = this.querySelector("#timeSheetContainer");
                 const currentDate = new Date();
 
                 for (let i = 1; i < 6; i++) {
+                    const dayTimeDto = this.getWeekTimeDto(i, weekTime)
                     const timeSheetDay = document.createElement('time-sheet-day');
                     timeSheetDay.label = this.getDayLabelText(i, currentDate);
                     timeSheetDay.timeInputCallback = (startTime, finishTime) => this.onDayTimeInput(i, startTime, finishTime);
@@ -60,10 +62,23 @@ export default class TimeSheetTable extends HTMLElement {
                     timeSheetDay.isLocked = this.isPastDay(i, currentDate)
                     container.appendChild(timeSheetDay);
                     this._timeSheetDays.push(timeSheetDay)
+                    timeSheetDay.startTime = dayTimeDto.startTime;
+                    timeSheetDay.finishTime = dayTimeDto.finishTime;
                 }
 
                 this.updateRemainingTime()
             })
+            .catch(error => console.log(error))
+    }
+
+    getWeekTimeDto(dayIndex, weekTime) {
+        switch (dayIndex) {
+            case 1: return weekTime.monday;
+            case 2: return weekTime.tuesday;
+            case 3: return weekTime.wendsday;
+            case 4: return weekTime.thrusday;
+            case 5: return weekTime.friday;
+        }
     }
 
     getDayLabelText(dayIndex, currentDate) {
@@ -126,8 +141,9 @@ export default class TimeSheetTable extends HTMLElement {
 
     async saveTime(day, startTime, finishTime) {
         const body = {
-            statTime: this.toDateTime(day, startTime),
-            finishTime: this.toDateTime(day, finishTime)
+            date: this.toUtcDate(day),
+            startTime: startTime,
+            finishTime: finishTime
         }
 
         const params = {
@@ -140,20 +156,10 @@ export default class TimeSheetTable extends HTMLElement {
             .catch(error => console.log(error))
     }
 
-    toDateTime(day, time) {
-        if (time === undefined || time === '')
-            return undefined;
-
+    toUtcDate(day) {
         const currentDay = new Date()
         const dateForDay = this.getDateForDayOfWeek(day, currentDay)
-        const timeSplit = time.split(':')
-        const hour = parseInt(timeSplit[0])
-        const minutes = parseInt(timeSplit[1])
-        const timeZoneOffsetInMinutes = currentDay.getTimezoneOffset()
-        const timeInMinutes = hour * 60 + minutes + timeZoneOffsetInMinutes
-        const timeInMilliseconds = timeInMinutes * 1000
-        const date = new Date(dateForDay.getTime() + timeInMilliseconds)
-        return date.toISOString()
+        return dateForDay.toISOString()
     }
 
     updateRemainingTime() {

@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 using Server.Database;
+using Server.Features.WeeklyTimeSheet;
 
 namespace Server;
 
@@ -19,7 +20,12 @@ public class Program
             options.UseSqlite($"Data Source={dbPath}");
         });
 
+        AddApplicationServices(builder.Services);
+
         var app = builder.Build();
+
+        MigrateDatabase(app.Services);
+
         UseStaticFiles("Features/WeeklyTimeSheet/View/static", "/weeklyTimesheet/static");
         app.MapControllers();
 
@@ -34,5 +40,18 @@ public class Program
                 RequestPath = requestPath
             });
         }
+    }
+
+    private static void MigrateDatabase(IServiceProvider services)
+    {
+        using var scope = services.CreateScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<TimeSheeterDbContext>();
+        dbContext.Database.Migrate();
+    }
+
+    private static void AddApplicationServices(IServiceCollection services)
+    {
+        services
+            .AddSingleton<ICurrentDateProvider, CurrentDateProvider>();
     }
 }

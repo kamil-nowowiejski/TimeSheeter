@@ -29,28 +29,35 @@ public class WeeklyTimeSheetController : Controller
     [HttpPost("SaveTime")]
     public async Task<IActionResult> SaveTime([FromBody] SaveTimeDto saveTimeDto)
     {
-        if (IsInTheSameDay(saveTimeDto.StartTime, saveTimeDto.FinishTime) == false)
-            return new BadRequestObjectResult("Start time and finish time must be in the same day");
+        if (saveTimeDto.StartTime >= saveTimeDto.FinishTime)
+            return new BadRequestObjectResult("Start time must be earlier than finish time.");
 
-        var workDay = new WorkDay()
+        var existingWorkDay = await _dbContext.WorkDay.Where(w => w.Date == saveTimeDto.Date.Date).SingleOrDefaultAsync();
+
+        if (existingWorkDay == null)
         {
-            Date = saveTimeDto.StartTime.Date,
-            StartTime = saveTimeDto.StartTime.TimeOfDay,
-            FinishTime = saveTimeDto.FinishTime.TimeOfDay
-        };
-
-        _dbContext.WorkDay.Add(workDay);
+            var workDay = new WorkDay()
+            {
+                Date = saveTimeDto.Date.Date,   
+                StartTime = saveTimeDto.StartTime,
+                FinishTime = saveTimeDto.FinishTime
+            };
+            _dbContext.WorkDay.Add(workDay);
+        }
+        else
+        {
+            existingWorkDay.StartTime = saveTimeDto.StartTime;
+            existingWorkDay.FinishTime = saveTimeDto.FinishTime;
+        }
         await _dbContext.SaveChangesAsync();
 
         return new OkResult();
-
-        bool IsInTheSameDay(DateTime startTime, DateTime finishTime) => startTime.Date.Equals(finishTime.Date);
     }
 
     /// <summary>
     /// Time is returned in UTC.
     /// </summary>
-    [HttpGet]
+    [HttpGet("GetCurrentWeekTime")]
     public async Task<ActionResult<WeekTimeGetDto>> GetCurrentWeekTime()
     {
         var currentDate = _currentDateProvider.GetCurrentDate();
@@ -61,24 +68,23 @@ public class WeeklyTimeSheetController : Controller
         var workDays = await _dbContext.WorkDay
             .Where(w => w.Date >= mondayDate && w.Date <= fridayDate)
             .ToListAsync();
-        
+
         return new WeekTimeGetDto()
         {
-            Monday = GetTimeDto(0), 
-            Tuesday = GetTimeDto(1), 
+            Monday = GetTimeDto(0),
+            Tuesday = GetTimeDto(1),
             Wendsday = GetTimeDto(2),
-            Thrusday = GetTimeDto(3), 
+            Thrusday = GetTimeDto(3),
             Friday = GetTimeDto(4)
         };
-         
+
         TimeDto GetTimeDto(int index)
         {
-            if(index >= workDays.Count())
+            if (index >= workDays.Count())
                 return new() { Date = mondayDate + TimeSpan.FromDays(index) };
-                
             return new()
             {
-                Date = workDays[index].Date, 
+                Date = workDays[index].Date,
                 StartTime = workDays[index].StartTime,
                 FinishTime = workDays[index].FinishTime
             };
@@ -92,3 +98,4 @@ public interface ICurrentDateProvider
     DateTime GetCurrentDate() => DateTime.Now.Date;
 }
 
+internal class CurrentDateProvider : ICurrentDateProvider { }
