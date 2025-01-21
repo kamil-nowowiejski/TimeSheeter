@@ -13,7 +13,7 @@ export default class TimeSheetTable extends HTMLElement {
                     <div class="startFinishLabels">
                         <label class="timeLabel">Start Time</label>
                         <label class="timeLabel">Finish Time</label>
-                        <label class="hoursWorked">Hours Worked</label>
+                        <label class="hoursWorked timeLabel">Hours Worked</label>
                     </div>
                 </div>
                 <label class='remainingTime'></label>
@@ -38,6 +38,7 @@ export default class TimeSheetTable extends HTMLElement {
                     text-align: left;
                     line-height: 50px;
                     margin-bottom: 10px;
+                    text-wrap: nowrap;
                 }
 
                 .dayError {
