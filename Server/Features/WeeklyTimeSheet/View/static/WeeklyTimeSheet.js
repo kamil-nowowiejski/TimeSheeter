@@ -26,21 +26,25 @@ class WeeklyTimeSheet extends HTMLElement {
 
             <style>
                 .flex-row {
-                    dispaly: flex;
+                    display: flex;
                     flex-direction: row;
                     flex-wrap: nowrap;
                     width: 100%;
                     height: 100%;
                 }
 
-                .side-menu {
-                    height: 100vh; 
-                    background-image: linear-gradient(to left, lightCyan, darkTurquoise);
-                }
-
-                .time-sheet-table {
+                .content-container {
+                    flex: 1;
                     margin-top: 8px;
                     margin-left: 8px;
+                }
+
+                .side-menu {
+                    height: 100vh; 
+                    flex-grow: 0;
+                    flex-shrink: 0;
+                    flex-basis: 250px;
+                    background-image: linear-gradient(to left, lightCyan, darkTurquoise);
                 }
             </style>
             `
