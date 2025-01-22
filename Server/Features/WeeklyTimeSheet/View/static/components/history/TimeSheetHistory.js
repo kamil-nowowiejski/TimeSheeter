@@ -15,6 +15,8 @@ export default class TimeSheetHistory extends HTMLElement {
             <style>
                 .weeks-container{
                     margin-top: 15px;
+                    display: grid;
+                    width: 60vw;
                 }
 
                 .month-picker-container{
@@ -81,11 +83,22 @@ export default class TimeSheetHistory extends HTMLElement {
         const allDays = this.getAllDaysInSelectedMonth()
         const weeks = this.splitDaysIntoWeeks(allDays)
         const container = this.getElementsByClassName('weeks-container')[0]
+        let row = 1
         weeks.forEach(week => {
-            const weekElement = document.createElement('time-sheet-read-only-week')
+            let column = 1
             const days = this.prepareWeekDays(week, weekTime)
-            weekElement.days = days
-            container.appendChild(weekElement)
+            days.forEach(day => {
+                const timeSheetDay = document.createElement('time-sheet-read-only-day')
+                timeSheetDay.style = `grid-column: ${column};grid-row: ${row}`
+                timeSheetDay.day = day
+                container.appendChild(timeSheetDay)
+                column++
+            })
+            row++
+            // const weekElement = document.createElement('time-sheet-read-only-week')
+            // const days = this.prepareWeekDays(week, weekTime)
+            // weekElement.days = days
+            // container.appendChild(weekElement)
         })
 
     }
@@ -127,7 +140,7 @@ export default class TimeSheetHistory extends HTMLElement {
 
     prepareWeekDays(week, weekTime) {
         return week.map(d => {
-            if(d === undefined)
+            if (d === undefined)
                 return undefined
 
             const dayTime = weekTime.find(dt => dt.date.getDate() === d.getDate())

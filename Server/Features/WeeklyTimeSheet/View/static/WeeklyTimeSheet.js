@@ -1,14 +1,12 @@
 import TimeSheetDay from './components/TimeSheetDay.js';
 import TimeSheetTable from './components/TimeSheetTable.js';
 import TimeSheetReadOnlyDay from './components/history/TimeSheetReadOnlyDay.js'
-import TimeSheetReadOnlyWeek from './components/history/TimeSheetReadOnlyWeek.js'
 import TimeSheetHistory from './components/history/TimeSheetHistory.js'
 import TimeSheetMenu from './components/timeSheetMenu.js'
 
 customElements.define('time-sheet-day', TimeSheetDay)
 customElements.define('time-sheet-table', TimeSheetTable);
 customElements.define('time-sheet-read-only-day', TimeSheetReadOnlyDay)
-customElements.define('time-sheet-read-only-week', TimeSheetReadOnlyWeek)
 customElements.define('time-sheet-history', TimeSheetHistory)
 customElements.define('time-sheet-menu', TimeSheetMenu)
 

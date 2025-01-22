@@ -18,9 +18,7 @@ export default class TimeSheetReadOnlyDay extends HTMLElement {
 
     createDayHTML() {
         this.innerHTML = `
-                <div class='day-container 
-                    ${this.isWeekend() ? 'weekend' : ''}
-                    ${this.isWeekend() === false && this.hasNoHours() ? 'free-day' : ''}'>
+                <div class='day-container '>
                     <label class='day-label'>${this.getDayLabel()}</label>
                     <label class='day-label'>${this.getWorkedHours()}</label>
                 </div>
@@ -31,23 +29,56 @@ export default class TimeSheetReadOnlyDay extends HTMLElement {
                         flex-direction: column;
                         flex-wrap: nowrap;
                         margin: 10px;
-                        width: 80px;
                         height: 60px;
+                        border-style: solid;
+                        border-width: 2px;
+                        border-color: grey;
+                        border-radius: 5px;
                     }
 
                     .weekend {
-                        background-color: gray;
+                        background-color: lightGray;
                     }
 
                     .free-day{
-                        background-color: red;
+                        background-color: moccasin;
+                    }
+                     
+                    .regular-past-day{
+                        background-color: paleGreen;
+                    }
+                     
+                    .current-day{
+                        background-color: whiteSmoke;
+                        border-color: plum;
+                        border-style: outset;
+                        border-width: 5px;
+                    }
+
+                    .future-day{
+                        background-color: whiteSmoke;
                     }
 
                     .day-label {
                         padding: 5px;
+                        text-align: center;
                     }
                 </style>
             `
+        const dayContainer = this.getElementsByClassName('day-container')[0]
+        const currentDay = new Date().getDate()
+        const thisDay = this.day.date.getDate()
+        const styleClass = this.isWeekend() 
+        ? 'weekend'
+        : currentDay === thisDay
+            ? 'current-day'
+            : currentDay < thisDay
+                ? 'future-day'
+                : this.hasNoHours() 
+                    ? 'free-day'
+                    : 'regular-past-day'
+
+        dayContainer.classList.add(styleClass)
     }
 
     createEmptyDayHTML() {
@@ -58,7 +89,6 @@ export default class TimeSheetReadOnlyDay extends HTMLElement {
 
                 <style>
                     .empty-day{
-                        width: 80px;
                         height: 60px;
                         margin: 10px;
                     }
@@ -76,11 +106,14 @@ export default class TimeSheetReadOnlyDay extends HTMLElement {
     }
 
     getWorkedHours() {
+        if(this.isWeekend())
+            return ''
+
         const workedTimeInMinutes = getTimeDifferenceInMinutes(this.day?.startTime, this.day?.finishTime)
         return timeInMinutesToString(workedTimeInMinutes)
     }
 
-    hasNoHours(){
+    hasNoHours() {
         const workedTimeInMinutes = getTimeDifferenceInMinutes(this.day?.startTime, this.day?.finishTime)
         return workedTimeInMinutes === undefined || workedTimeInMinutes === 0
     }
