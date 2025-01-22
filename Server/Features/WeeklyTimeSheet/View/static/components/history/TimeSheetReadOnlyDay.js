@@ -66,19 +66,34 @@ export default class TimeSheetReadOnlyDay extends HTMLElement {
                 </style>
             `
         const dayContainer = this.getElementsByClassName('day-container')[0]
-        const currentDay = new Date().getDate()
-        const thisDay = this.day.date.getDate()
-        const styleClass = this.isWeekend() 
-        ? 'weekend'
-        : currentDay === thisDay
-            ? 'current-day'
-            : currentDay < thisDay
-                ? 'future-day'
-                : this.hasNoHours() 
-                    ? 'free-day'
-                    : 'regular-past-day'
+        const currentDay = new Date()
+        const thisDay = this.day.date
+        const styleClass = this.isWeekend()
+            ? 'weekend'
+            : isPresentDay()
+                ? 'current-day'
+                : isFutureDay()
+                    ? 'future-day'
+                    : this.hasNoHours()
+                        ? 'free-day'
+                        : 'regular-past-day'
 
         dayContainer.classList.add(styleClass)
+
+        function isPresentDay() {
+            return currentDay.getFullYear() === thisDay.getFullYear()
+                && currentDay.getMonth() === thisDay.getMonth()
+                && currentDay.getDate() === thisDay.getDate()
+        }
+
+        function isFutureDay() {
+            if (thisDay.getFullYear() > currentDay.getFullYear()) return true
+            if (thisDay.getFullYear() < currentDay.getFullYear()) return false
+            if (thisDay.getMonth() > currentDay.getMonth()) return true;
+            if (thisDay.getMonth() < currentDay.getMonth()) return false;
+            if (thisDay.getDate() > currentDay.getDate()) return true;
+            return false
+        }
     }
 
     createEmptyDayHTML() {
@@ -106,7 +121,7 @@ export default class TimeSheetReadOnlyDay extends HTMLElement {
     }
 
     getWorkedHours() {
-        if(this.isWeekend())
+        if (this.isWeekend())
             return ''
 
         const workedTimeInMinutes = getTimeDifferenceInMinutes(this.day?.startTime, this.day?.finishTime)

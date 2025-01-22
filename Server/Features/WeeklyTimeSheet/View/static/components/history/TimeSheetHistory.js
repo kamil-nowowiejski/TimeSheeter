@@ -83,6 +83,7 @@ export default class TimeSheetHistory extends HTMLElement {
         const allDays = this.getAllDaysInSelectedMonth()
         const weeks = this.splitDaysIntoWeeks(allDays)
         const container = this.getElementsByClassName('weeks-container')[0]
+        container.innerHTML = ``
         let row = 1
         weeks.forEach(week => {
             let column = 1
