@@ -20,7 +20,8 @@ class WeeklyTimeSheet extends HTMLElement {
             <div class="flex-row">
                 <time-sheet-menu class='side-menu'></time-sheet-menu>
                 <div class='content-container'>
-                    <time-sheet-table class='time-sheet-table'></time-sheet-table>
+                    <!-- <time-sheet-table class='time-sheet-table'></time-sheet-table> -->
+                    <time-sheet-history></time-sheet-history>
                 </div>
             </div>  
 

@@ -1,22 +1,28 @@
 export default class TimeSheetReadOnlyWeek extends HTMLElement {
     constructor() { super() }
 
-    get mondayDate() { return this._mondayDate }
-    set mondayDate(value) { this._mondayDate = value }
+    get days() { return this._days }
+    set days(value) { this._days = value }
 
     connectedCallback() {
         this.innerHTML = `
             <div class='read-only-week-container'>
 
             </div>
+
+            <style>
+                .read-only-week-container {
+                    display: flex;
+                    flex-direction: row;
+                }
+            </style>
         `
-        const container = this.getElementsByClassName('read-only-week-container')
-        for (let i = 1; i < 6; i++) {
+        const container = this.getElementsByClassName('read-only-week-container')[0]
+        this.days.forEach(day => {
             const timeSheetDay = document.createElement('time-sheet-read-only-day')
-            timeSheetDay.label = 'test label'
-            timeSheetDay.startTime = 'test'
-            timeSheetDay.finishTime = 'test 2'
+            timeSheetDay.day = day
             container.appendChild(timeSheetDay)
-        }
+        })
     }
+
 }

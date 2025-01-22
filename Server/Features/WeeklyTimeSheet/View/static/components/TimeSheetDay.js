@@ -1,4 +1,4 @@
-import { convertTimeToMinutes, timeInMinutesToString } from '../helpers/timeHelpers.js'
+import { convertTimeToMinutes, timeInMinutesToString, isTimeValueUndefined, getTimeDifferenceInMinutes }  from '../helpers/timeHelpers.js'
 
 export default class TimeSheetDay extends HTMLElement {
 
@@ -16,7 +16,7 @@ export default class TimeSheetDay extends HTMLElement {
         this.refreshWorkedHours()
     }
 
-    get workedTime() { return this.getWorkedTime() }
+    get workedTime() { return getTimeDifferenceInMinutes(this.startTime, this.finishTime) }
 
     get label() { return this._label; }
     set label(text) { this._label = text; }
@@ -105,7 +105,7 @@ export default class TimeSheetDay extends HTMLElement {
         const startTime = this.getStartTimeValue()
         const finishTime = this.getFinishTimeValue()
 
-        if (this.isTimeValueUndefined(startTime) || this.isTimeValueUndefined(finishTime))
+        if (isTimeValueUndefined(startTime) || isTimeValueUndefined(finishTime))
             return '-';
 
         const startTimeMinutes = convertTimeToMinutes(startTime);
@@ -135,7 +135,7 @@ export default class TimeSheetDay extends HTMLElement {
     getFinishTimeValue() { return this.getFinishTimeElement()?.value; }
     getMasterContainer() { return this.getElementsByClassName('masterContainer')[0] }
     getPadlockIconElement() { return this.getElementsByClassName('padlockIcon')[0] }
-    unifyTimeValue(rawValue) { return this.isTimeValueUndefined(rawValue) ? undefined : rawValue }
+    unifyTimeValue(rawValue) { return isTimeValueUndefined(rawValue) ? undefined : rawValue }
     refreshWorkedHours() {
         const element = this.getElementsByClassName("workedHours")[0]
         element.textContent = this.getWorkedHours()
@@ -144,7 +144,7 @@ export default class TimeSheetDay extends HTMLElement {
     validateTimeInput() {
         const startTime = this.getStartTimeValue();
         const finishTime = this.getFinishTimeValue();
-        if (this.isTimeValueUndefined(startTime) || this.isTimeValueUndefined(finishTime)) {
+        if (isTimeValueUndefined(startTime) || isTimeValueUndefined(finishTime)) {
             this.resetValidationContainer();
             return true;
         }
@@ -182,16 +182,6 @@ export default class TimeSheetDay extends HTMLElement {
             validationContainer.classList.add('invalid')
 
         this.errorCallback?.(error)
-    }
-
-    isTimeValueUndefined(timeValue) { return timeValue === undefined || timeValue == '' }
-
-    getWorkedTime() {
-        const startTime = this.startTime;
-        const finishTime = this.finishTime;
-        if (this.isTimeValueUndefined(startTime) || this.isTimeValueUndefined(finishTime))
-            return 0;
-        return convertTimeToMinutes(finishTime) - convertTimeToMinutes(startTime)
     }
 }
 

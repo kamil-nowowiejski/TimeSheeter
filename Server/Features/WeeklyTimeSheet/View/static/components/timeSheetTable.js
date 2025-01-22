@@ -1,4 +1,5 @@
 import { timeInMinutesToString } from '../helpers/timeHelpers.js'
+import { getShortDayName, getLongDayName } from '../helpers/dayNames.js'
 
 export default class TimeSheetTable extends HTMLElement {
 
@@ -69,7 +70,7 @@ export default class TimeSheetTable extends HTMLElement {
 
                 this.updateRemainingTime()
             })
-            .catch(error => console.log(error))
+            .catch(error => console.error(error))
     }
 
     getWeekTimeDto(dayIndex, weekTime) {
@@ -84,28 +85,8 @@ export default class TimeSheetTable extends HTMLElement {
 
     getDayLabelText(dayIndex, currentDate) {
         const dateForDayIndex = this.getDateForDayOfWeek(dayIndex, currentDate);
-        const dayOfWeekLabel = this.getShortDayName(dayIndex);
+        const dayOfWeekLabel = getShortDayName(dayIndex);
         return dayOfWeekLabel + " " + dateForDayIndex.getDate();
-    }
-
-    getShortDayName(dayIndex) {
-        switch (dayIndex) {
-            case 1: return "Mon";
-            case 2: return "Tu";
-            case 3: return "Wen";
-            case 4: return "Thu";
-            case 5: return "Fri";
-        }
-    }
-
-    getLongDayName(dayIndex) {
-        switch (dayIndex) {
-            case 1: return "Monday"
-            case 2: return "Tuesday"
-            case 3: return "Wendsday"
-            case 4: return "Thursday"
-            case 5: return "Friday"
-        }
     }
 
     getDateForDayOfWeek(dayIndex, currentDate) {
@@ -119,7 +100,7 @@ export default class TimeSheetTable extends HTMLElement {
 
     showErrorForDay(dayIndex, error) {
         this.removeErrorForDay(dayIndex);
-        const dayName = this.getLongDayName(dayIndex);
+        const dayName = getLongDayName(dayIndex);
         const errorsElement = this.getErrorsElement();
         const errorLabel = document.createElement("label");
         errorLabel.textContent = dayName + ": " + error;
@@ -154,7 +135,7 @@ export default class TimeSheetTable extends HTMLElement {
         }
 
         await fetch('/weeklytimesheet/savetime', params)
-            .catch(error => console.log(error))
+            .catch(error => console.error(error))
     }
 
     toUtcDate(day) {
