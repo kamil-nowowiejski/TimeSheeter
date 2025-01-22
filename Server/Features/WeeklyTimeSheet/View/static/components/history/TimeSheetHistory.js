@@ -1,5 +1,8 @@
+import { isTimeValueDefined } from "../../helpers/timeHelpers.js";
+
 export default class TimeSheetHistory extends HTMLElement {
-    constructor() { super() }
+
+    constructor() { super(); }
 
     async connectedCallback() {
         this.innerHTML = `
@@ -8,19 +11,30 @@ export default class TimeSheetHistory extends HTMLElement {
                     <label for='month'>Month</label>
                     <input id='month' type="month" class='month-picker'>
                 </div>
+
                 <div class='weeks-container'>
+                </div>
+                    
+                <div class='aggregated-stats'>
+                    <label class='worked-days'>Worked days: </label>
+                    <label class='earned-money'>Earned money: </label>
                 </div>
             </div>
 
             <style>
-                .weeks-container{
+                .weeks-container {
                     margin-top: 15px;
                     display: grid;
                     width: 60vw;
                 }
 
-                .month-picker-container{
+                .month-picker-container {
                     margin-top: 20px;
+                }
+
+                .aggregated-stats {
+                    display: flex;
+                    flex-direction: column;
                 }
             </style>
         `
@@ -41,15 +55,23 @@ export default class TimeSheetHistory extends HTMLElement {
         }))
             .then(response => response.text())
             .then(json => JSON.parse(json))
-            .then(dto => dto.days.map(d => {
-                return {
-                    date: new Date(Date.parse(d.date)),
-                    startTime: d.startTime,
-                    finishTime: d.finishTime
-                }
-            }))
-            .then(monthTime => { this.populateWeeks(monthTime) })
+            .then(dto => this.transformDto(dto))
+            .then(monthTime => {
+                this.populateWeeks(monthTime.days)
+                this.populateAggregatedStats(monthTime)
+            })
             .catch(error => console.error(error))
+    }
+
+    transformDto(dto) {
+        return {
+            money: dto.money,
+            days: dto.days.map(d => ({
+                date: new Date(Date.parse(d.date)),
+                startTime: d.startTime,
+                finishTime: d.finishTime
+            }))
+        }
     }
 
     getMonthEdgeDays() {
@@ -96,12 +118,7 @@ export default class TimeSheetHistory extends HTMLElement {
                 column++
             })
             row++
-            // const weekElement = document.createElement('time-sheet-read-only-week')
-            // const days = this.prepareWeekDays(week, weekTime)
-            // weekElement.days = days
-            // container.appendChild(weekElement)
         })
-
     }
 
     getAllDaysInSelectedMonth() {
@@ -151,5 +168,16 @@ export default class TimeSheetHistory extends HTMLElement {
                 finishTime: dayTime?.finishTime
             }
         })
+    }
+
+    populateAggregatedStats(monthTime) {
+        const workedDays = this.getElementsByClassName('worked-days')[0]
+        const earnedMoney = this.getElementsByClassName('earned-money')[0]
+
+        const totalWorkedDays = monthTime.days
+            .filter(d => isTimeValueDefined(d.startTime) && isTimeValueDefined(d.finishTime))
+            .length
+
+        workedDays.textContent = `Worked days: ${totalWorkedDays}.  TODO: add hint on how this is calcilated`
     }
 }

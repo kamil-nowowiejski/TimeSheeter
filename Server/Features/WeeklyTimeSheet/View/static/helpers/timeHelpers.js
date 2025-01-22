@@ -21,3 +21,4 @@ export function getTimeDifferenceInMinutes(startTime, finishTime) {
 }
 
 export function isTimeValueUndefined(timeValue) { return timeValue === undefined || timeValue == '' }
+export function isTimeValueDefined(timeValue) { return isTimeValueUndefined(timeValue) === false }
