@@ -29,6 +29,15 @@ public class TimeSheetHistoryController
             })
             .ToListAsync();
 
-        return new TimeSheetHistoryDto { Days = days };
+        return new TimeSheetHistoryDto
+        {
+            Days = days,
+            Earnings = new()
+            {
+                EarningsPerHour = 23,//TODO introduce config
+                Currency = "PLN"
+
+            }
+        };
     }
 }

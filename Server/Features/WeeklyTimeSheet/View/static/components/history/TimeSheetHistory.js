@@ -88,7 +88,7 @@ export default class TimeSheetHistory extends HTMLElement {
 
     transformDto(dto) {
         return {
-            money: dto.money,
+            earnings: dto.earnings,
             days: dto.days.map(d => ({
                 date: new Date(Date.parse(d.date)),
                 startTime: d.startTime,
@@ -201,7 +201,11 @@ export default class TimeSheetHistory extends HTMLElement {
             .filter(d => isTimeValueDefined(d.startTime) && isTimeValueDefined(d.finishTime))
             .length
 
-        workedDays.textContent = `Worked days: ${totalWorkedDays}.`
-        earnedMoney.textContent = 'Earned money: 500 pln'
+        const earningsPerHour = monthTime.earnings.earningsPerHour
+        const totalEarnings = totalWorkedDays * earningsPerHour * 8
+        const currency = monthTime.earnings.currency
+
+        workedDays.textContent = `Worked days: ${totalWorkedDays}`
+        earnedMoney.textContent = `Earned money: ${totalEarnings} ${currency}`
     }
 }
