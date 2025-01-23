@@ -17,8 +17,15 @@ export default class TimeSheetHistory extends HTMLElement {
                     
                 <div class='aggregated-stats'>
                     <label class='worked-days'>Worked days: </label>
-                    <label class='earned-money'>Earned money: </label>
+                    <div>
+                        <label class='earned-money'>Earned money: </label>
+                        <button type='button' class='aggregated-stats-info'>
+                            <i class='fa-solid fa-info fa-xs'></i>
+                        </button>
+                    </div>
                 </div>
+
+                <aggregated-stats-info-modal class='aggregated-stats-info-modal'></aggregated-stats-info-modal>
             </div>
 
             <style>
@@ -36,11 +43,27 @@ export default class TimeSheetHistory extends HTMLElement {
                     display: flex;
                     flex-direction: column;
                 }
+                
+                .aggregated-stats-info{
+                    vertical-align: super;
+                    border: none;
+                    background-color: transparent;
+                    padding: 0;
+                    margin: 0;
+                }
+
+                .aggregated-stats-info:hover{
+                    cursor: help;
+                }
             </style>
         `
 
-        const monthPicker = this.getMonthPicker()
-        monthPicker.addEventListener('input', () => this.monthChangedCallback())
+        this.getMonthPicker()
+            .addEventListener('input', () => this.monthChangedCallback())
+
+        this.getElementsByClassName('aggregated-stats-info')[0]
+            .onclick = () => this.getElementsByClassName('aggregated-stats-info-modal')[0].open()
+
         await this.setCurrentMonth()
     }
 
@@ -178,6 +201,7 @@ export default class TimeSheetHistory extends HTMLElement {
             .filter(d => isTimeValueDefined(d.startTime) && isTimeValueDefined(d.finishTime))
             .length
 
-        workedDays.textContent = `Worked days: ${totalWorkedDays}.  TODO: add hint on how this is calcilated`
+        workedDays.textContent = `Worked days: ${totalWorkedDays}.`
+        earnedMoney.textContent = 'Earned money: 500 pln'
     }
 }
