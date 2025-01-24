@@ -1,4 +1,4 @@
-import { isTimeValueDefined } from "../../helpers/timeHelpers.js";
+import { isTimeValueDefined, getTimeDifferenceInMinutes, timeInMinutesToString } from "../../helpers/timeHelpers.js";
 
 export default class TimeSheetHistory extends HTMLElement {
 
@@ -54,6 +54,15 @@ export default class TimeSheetHistory extends HTMLElement {
 
                 .aggregated-stats-info:hover{
                     cursor: help;
+                }
+
+                .weekly-hours{
+                    margin: auto;
+                }
+
+                .total-hours-header{
+                    margin: auto;
+                    background-color:red;
                 }
             </style>
         `
@@ -129,7 +138,7 @@ export default class TimeSheetHistory extends HTMLElement {
         const weeks = this.splitDaysIntoWeeks(allDays)
         const container = this.getElementsByClassName('weeks-container')[0]
         container.innerHTML = ``
-        let row = 1
+        let row = 2
         weeks.forEach(week => {
             let column = 1
             const days = this.prepareWeekDays(week, weekTime)
@@ -140,8 +149,22 @@ export default class TimeSheetHistory extends HTMLElement {
                 container.appendChild(timeSheetDay)
                 column++
             })
+            const weeklyHours = document.createElement('span')
+            const totalWeekMinutes = days
+                .filter(d => d?.startTime !== undefined && d?.finishTime !== undefined)
+                .reduce((total, current) => total + getTimeDifferenceInMinutes(current.startTime, current.finishTime), 0)
+            weeklyHours.textContent = timeInMinutesToString(totalWeekMinutes)
+            weeklyHours.style = `grid-column: ${column};grid-row: ${row}`
+            weeklyHours.classList.add('weekly-hours')
+            container.appendChild(weeklyHours)
             row++
         })
+
+        const totalHoursHeader = document.createElement('span')
+        totalHoursHeader.textContent = 'Total Hours'
+        totalHoursHeader.classList.add('total-hours-header')
+        totalHoursHeader.style = `grid-column: 8;grid-row: 1`
+        container.appendChild(totalHoursHeader)
     }
 
     getAllDaysInSelectedMonth() {
