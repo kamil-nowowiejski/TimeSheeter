@@ -30,7 +30,7 @@ export default class TimeSheetHistory extends HTMLElement {
 
             <style>
                 .weeks-container {
-                    margin-top: 15px;
+                    margin-top: 5px;
                     display: grid;
                     width: 60vw;
                 }
@@ -57,12 +57,21 @@ export default class TimeSheetHistory extends HTMLElement {
                 }
 
                 .weekly-hours{
-                    margin: auto;
+                    justify-self: left;
+                    align-self: center;
+                    margin-left: 10px;
                 }
 
                 .total-hours-header{
-                    margin: auto;
-                    background-color:red;
+                    height: 30px;
+                    /* display: none; */
+                    margin-left: 10px;
+                }
+
+                .vertical-border{
+                    width: 2px;
+                    background-color: cornflowerBlue;
+                    margin: 0px 10px 0px 10px;
                 }
             </style>
         `
@@ -142,29 +151,43 @@ export default class TimeSheetHistory extends HTMLElement {
         weeks.forEach(week => {
             let column = 1
             const days = this.prepareWeekDays(week, weekTime)
-            days.forEach(day => {
+            days.forEach(day =>{
                 const timeSheetDay = document.createElement('time-sheet-read-only-day')
                 timeSheetDay.style = `grid-column: ${column};grid-row: ${row}`
                 timeSheetDay.day = day
                 container.appendChild(timeSheetDay)
                 column++
             })
-            const weeklyHours = document.createElement('span')
-            const totalWeekMinutes = days
-                .filter(d => d?.startTime !== undefined && d?.finishTime !== undefined)
-                .reduce((total, current) => total + getTimeDifferenceInMinutes(current.startTime, current.finishTime), 0)
-            weeklyHours.textContent = timeInMinutesToString(totalWeekMinutes)
-            weeklyHours.style = `grid-column: ${column};grid-row: ${row}`
-            weeklyHours.classList.add('weekly-hours')
-            container.appendChild(weeklyHours)
+
+            this.spawnWeeklyTotalHours(days, column+1, row, container);
             row++
         })
 
-        const totalHoursHeader = document.createElement('span')
-        totalHoursHeader.textContent = 'Total Hours'
-        totalHoursHeader.classList.add('total-hours-header')
-        totalHoursHeader.style = `grid-column: 8;grid-row: 1`
-        container.appendChild(totalHoursHeader)
+        this.spawnTotalHoursHeader(container, row);
+    }
+
+    spawnWeeklyTotalHours(days, column, row, container) {
+        const weeklyHours = document.createElement('label');
+        const totalWeekMinutes = days
+            .filter(d => d?.startTime !== undefined && d?.finishTime !== undefined)
+            .reduce((total, current) => total + getTimeDifferenceInMinutes(current.startTime, current.finishTime), 0);
+        weeklyHours.textContent = timeInMinutesToString(totalWeekMinutes);
+        weeklyHours.style = `grid-column: ${column};grid-row: ${row}`;
+        weeklyHours.classList.add('weekly-hours');
+        container.appendChild(weeklyHours);
+    }
+
+    spawnTotalHoursHeader(container, lastRow) {
+        const verticalBorder = document.createElement('div')
+        verticalBorder.style = `grid-column: 8;grid-row:1 / ${lastRow}`
+        verticalBorder.classList.add('vertical-border')
+        container.appendChild(verticalBorder)
+
+        const totalHoursHeader = document.createElement('label');
+        totalHoursHeader.textContent = 'Total';
+        totalHoursHeader.classList.add('total-hours-header');
+        totalHoursHeader.style = `grid-column: 9;grid-row: 1`;
+        container.appendChild(totalHoursHeader);
     }
 
     getAllDaysInSelectedMonth() {

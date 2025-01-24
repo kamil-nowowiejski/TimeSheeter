@@ -30,6 +30,7 @@ export default class TimeSheetReadOnlyDay extends HTMLElement {
                         flex-wrap: nowrap;
                         margin: 10px;
                         height: 60px;
+                        width: 90px;
                         border-style: solid;
                         border-width: 2px;
                         border-color: grey;
