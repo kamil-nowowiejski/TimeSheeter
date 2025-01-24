@@ -14,18 +14,8 @@ export default class TimeSheetHistory extends HTMLElement {
 
                 <div class='weeks-container'>
                 </div>
-                    
-                <div class='aggregated-stats'>
-                    <label class='worked-days'>Worked days: </label>
-                    <div>
-                        <label class='earned-money'>Earned money: </label>
-                        <button type='button' class='aggregated-stats-info'>
-                            <i class='fa-solid fa-info fa-xs'></i>
-                        </button>
-                    </div>
-                </div>
 
-                <aggregated-stats-info-modal class='aggregated-stats-info-modal'></aggregated-stats-info-modal>
+                <aggregated-stats class='aggregated-stats'></aggregated-stats>
             </div>
 
             <style>
@@ -39,23 +29,6 @@ export default class TimeSheetHistory extends HTMLElement {
                     margin-top: 20px;
                 }
 
-                .aggregated-stats {
-                    display: flex;
-                    flex-direction: column;
-                }
-                
-                .aggregated-stats-info{
-                    vertical-align: super;
-                    border: none;
-                    background-color: transparent;
-                    padding: 0;
-                    margin: 0;
-                }
-
-                .aggregated-stats-info:hover{
-                    cursor: help;
-                }
-
                 .weekly-hours{
                     justify-self: left;
                     align-self: center;
@@ -64,7 +37,6 @@ export default class TimeSheetHistory extends HTMLElement {
 
                 .total-hours-header{
                     height: 30px;
-                    /* display: none; */
                     margin-left: 10px;
                 }
 
@@ -78,9 +50,6 @@ export default class TimeSheetHistory extends HTMLElement {
 
         this.getMonthPicker()
             .addEventListener('input', () => this.monthChangedCallback())
-
-        this.getElementsByClassName('aggregated-stats-info')[0]
-            .onclick = () => this.getElementsByClassName('aggregated-stats-info-modal')[0].open()
 
         await this.setCurrentMonth()
     }
@@ -99,7 +68,8 @@ export default class TimeSheetHistory extends HTMLElement {
             .then(dto => this.transformDto(dto))
             .then(monthTime => {
                 this.populateWeeks(monthTime.days)
-                this.populateAggregatedStats(monthTime)
+                const aggregatedStats = this.getElementsByClassName('aggregated-stats')[0]
+                aggregatedStats.monthTime = monthTime
             })
             .catch(error => console.error(error))
     }
@@ -151,7 +121,7 @@ export default class TimeSheetHistory extends HTMLElement {
         weeks.forEach(week => {
             let column = 1
             const days = this.prepareWeekDays(week, weekTime)
-            days.forEach(day =>{
+            days.forEach(day => {
                 const timeSheetDay = document.createElement('time-sheet-read-only-day')
                 timeSheetDay.style = `grid-column: ${column};grid-row: ${row}`
                 timeSheetDay.day = day
@@ -159,7 +129,7 @@ export default class TimeSheetHistory extends HTMLElement {
                 column++
             })
 
-            this.spawnWeeklyTotalHours(days, column+1, row, container);
+            this.spawnWeeklyTotalHours(days, column + 1, row, container);
             row++
         })
 
@@ -237,21 +207,5 @@ export default class TimeSheetHistory extends HTMLElement {
                 finishTime: dayTime?.finishTime
             }
         })
-    }
-
-    populateAggregatedStats(monthTime) {
-        const workedDays = this.getElementsByClassName('worked-days')[0]
-        const earnedMoney = this.getElementsByClassName('earned-money')[0]
-
-        const totalWorkedDays = monthTime.days
-            .filter(d => isTimeValueDefined(d.startTime) && isTimeValueDefined(d.finishTime))
-            .length
-
-        const earningsPerHour = monthTime.earnings.earningsPerHour
-        const totalEarnings = totalWorkedDays * earningsPerHour * 8
-        const currency = monthTime.earnings.currency
-
-        workedDays.textContent = `Worked days: ${totalWorkedDays}`
-        earnedMoney.textContent = `Earned money: ${totalEarnings} ${currency}`
     }
 }

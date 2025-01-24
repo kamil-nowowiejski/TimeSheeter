@@ -1,6 +1,7 @@
 import TimeSheetDay from './components/TimeSheetDay.js';
 import TimeSheetTable from './components/TimeSheetTable.js';
 import TimeSheetReadOnlyDay from './components/history/TimeSheetReadOnlyDay.js'
+import AggregatedStatsInfo from './components/history/AggregatedStats.js';
 import AggregatedStatsInfoModal from './components/history/AggregatedStatsInfoModal.js';
 import TimeSheetHistory from './components/history/TimeSheetHistory.js'
 import TimeSheetMenu from './components/timeSheetMenu.js'
@@ -8,6 +9,7 @@ import TimeSheetMenu from './components/timeSheetMenu.js'
 customElements.define('time-sheet-day', TimeSheetDay)
 customElements.define('time-sheet-table', TimeSheetTable);
 customElements.define('time-sheet-read-only-day', TimeSheetReadOnlyDay)
+customElements.define('aggregated-stats', AggregatedStatsInfo)
 customElements.define('aggregated-stats-info-modal', AggregatedStatsInfoModal)
 customElements.define('time-sheet-history', TimeSheetHistory)
 customElements.define('time-sheet-menu', TimeSheetMenu)
