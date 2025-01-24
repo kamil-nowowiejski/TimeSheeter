@@ -1,3 +1,5 @@
+import { generateInvoice } from "../../helpers/invoiceGenerator"
+
 export default class InvoiceGenerator extends HTMLElement {
     constructor(){super()}
 
@@ -12,9 +14,7 @@ export default class InvoiceGenerator extends HTMLElement {
         `
 
         this.getElementsByClassName('generate-invoice-button')[0]
-            .onclick = () => this.generateInvoice()
+            .onclick = () => generateInvoice()
     }
 
-    generateInvoice(){
-    }
 }

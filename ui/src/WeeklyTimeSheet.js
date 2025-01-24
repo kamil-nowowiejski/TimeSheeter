@@ -1,3 +1,4 @@
+import './styles.css'
 import MonthPicker from './components/monthPicker.js';
 import TimeSheetDay from './components/TimeSheetDay.js';
 import TimeSheetTable from './components/TimeSheetTable.js';
@@ -6,7 +7,7 @@ import AggregatedStatsInfo from './components/history/AggregatedStats.js';
 import AggregatedStatsInfoModal from './components/history/AggregatedStatsInfoModal.js';
 import TimeSheetHistory from './components/history/TimeSheetHistory.js'
 import TimeSheetMenu from './components/timeSheetMenu.js'
-import InvoiceGenerator from './components/invoiveGeneration/InvoiceGenerator.js';
+import InvoiceGenerator from './components/invoiceGeneration/InvoiceGenerator.js';
 
 customElements.define('month-picker', MonthPicker)
 customElements.define('time-sheet-day', TimeSheetDay)

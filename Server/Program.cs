@@ -25,21 +25,19 @@ public class Program
         var app = builder.Build();
 
         MigrateDatabase(app.Services);
+        Console.WriteLine("dffds");
+        Console.WriteLine(Path.Combine(builder.Environment.ContentRootPath, "../ui/dist"));
 
-        UseStaticFiles("Features/WeeklyTimeSheet/View/static", "/weeklyTimesheet/static");
+        app.UseStaticFiles(new StaticFileOptions
+        {
+            FileProvider = new PhysicalFileProvider(
+                    Path.Combine(builder.Environment.ContentRootPath, "../ui/dist")),
+            RequestPath = "/static"
+        });
+
         app.MapControllers();
 
         app.Run();
-
-        void UseStaticFiles(string filesPath, string requestPath)
-        {
-            app.UseStaticFiles(new StaticFileOptions
-            {
-                FileProvider = new PhysicalFileProvider(
-                        Path.Combine(builder.Environment.ContentRootPath, filesPath)),
-                RequestPath = requestPath
-            });
-        }
     }
 
     private static void MigrateDatabase(IServiceProvider services)
