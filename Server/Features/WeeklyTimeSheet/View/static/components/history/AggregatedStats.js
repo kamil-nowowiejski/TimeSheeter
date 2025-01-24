@@ -67,10 +67,10 @@ export default class AggregatedStatsInfo extends HTMLElement {
             getEarnings(totalWorkedDays, this.monthTime.earnings.earningsPerHour)
         const currency = this.monthTime.earnings.currency
 
-        workedDaysElem.textContent += `${totalWorkedDays}`
-        earnerdMoneyGrossVatElem.textContent += formatMoney(grossVatEarnings)
-        earnedMoneyGrossElem.textContent += formatMoney(grossEarnings)
-        earnedMoneyNetElem.textContent += formatMoney(netEarnings)
+        workedDaysElem.textContent = `Worked days: ${totalWorkedDays}`
+        earnerdMoneyGrossVatElem.textContent = `Earned money (gross + VAT): ${formatMoney(grossVatEarnings)}`
+        earnedMoneyGrossElem.textContent = `Earned money (gross): ${formatMoney(grossEarnings)}`
+        earnedMoneyNetElem.textContent = `Earned money (net): ${formatMoney(netEarnings)}`
 
         function formatMoney(value) {
             return Intl.NumberFormat('pl-pl', { style: 'currency', currency: currency })

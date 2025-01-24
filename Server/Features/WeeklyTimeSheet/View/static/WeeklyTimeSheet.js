@@ -1,3 +1,4 @@
+import MonthPicker from './components/monthPicker.js';
 import TimeSheetDay from './components/TimeSheetDay.js';
 import TimeSheetTable from './components/TimeSheetTable.js';
 import TimeSheetReadOnlyDay from './components/history/TimeSheetReadOnlyDay.js'
@@ -5,7 +6,9 @@ import AggregatedStatsInfo from './components/history/AggregatedStats.js';
 import AggregatedStatsInfoModal from './components/history/AggregatedStatsInfoModal.js';
 import TimeSheetHistory from './components/history/TimeSheetHistory.js'
 import TimeSheetMenu from './components/timeSheetMenu.js'
+import InvoiceGenerator from './components/invoiveGeneration/InvoiceGenerator.js';
 
+customElements.define('month-picker', MonthPicker)
 customElements.define('time-sheet-day', TimeSheetDay)
 customElements.define('time-sheet-table', TimeSheetTable);
 customElements.define('time-sheet-read-only-day', TimeSheetReadOnlyDay)
@@ -13,6 +16,7 @@ customElements.define('aggregated-stats', AggregatedStatsInfo)
 customElements.define('aggregated-stats-info-modal', AggregatedStatsInfoModal)
 customElements.define('time-sheet-history', TimeSheetHistory)
 customElements.define('time-sheet-menu', TimeSheetMenu)
+customElements.define('invoice-generator', InvoiceGenerator)
 
 class WeeklyTimeSheet extends HTMLElement {
     constructor() { super() }
@@ -23,7 +27,7 @@ class WeeklyTimeSheet extends HTMLElement {
                 <time-sheet-menu class='side-menu'></time-sheet-menu>
                 <div class='content-container'>
                     <!-- <time-sheet-table class='time-sheet-table'></time-sheet-table> -->
-                    <time-sheet-history></time-sheet-history>
+                    <invoice-generator></invoice-generator>
                 </div>
             </div>  
 
@@ -53,8 +57,9 @@ class WeeklyTimeSheet extends HTMLElement {
             `
 
         const menu = this.getElementsByClassName('side-menu')[0]
-        menu.onTimeSheetHistoryCallback = () => this.showElement('time-sheet-history')
-        menu.onCurrentWeekCallback = () => this.showElement('time-sheet-table')
+        menu.addEventListener("timeSheetHistorySelected", () => this.showElement('time-sheet-history'))
+        menu.addEventListener('currentWeekSelected', () => this.showElement('time-sheet-table'))
+        menu.addEventListener('invoiceGeneratorSelected', () => this.showElement('invoice-generator'))
     }
     
     showElement(elementName){

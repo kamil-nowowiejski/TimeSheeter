@@ -1,12 +1,6 @@
 export default class TimeSheetMenu extends HTMLElement {
     constructor() { super() }
 
-    get onCurrentWeekCallback() { return this._onCurrentWeekCallback }
-    set onCurrentWeekCallback(value) { this._onCurrentWeekCallback = value }
-
-    get onTimeSheetHistoryCallback() { return this._onTimeSheetHistoryCallback }
-    set onTimeSheetHistoryCallback(value) { this._onTimeSheetHistoryCallback = value }
-
     connectedCallback() {
         this.innerHTML = `
             <div class="menu-container">
@@ -18,6 +12,10 @@ export default class TimeSheetMenu extends HTMLElement {
                 <button type="button" class="menu-item time-sheet-history">
                     <i class="fa-solid fa-clock-rotate-left fa-lg icon-style"></i>
                     Timesheet History
+                </button>
+                <button type='button' class='menu-item invoice-generator'>
+                    <i class='fa-solid fa-dollar-sign fa-lg icon-style'></i>
+                    Generate Invoice
                 </button>
             </div>
 
@@ -45,10 +43,13 @@ export default class TimeSheetMenu extends HTMLElement {
             </style>
             `
 
-        const currentWeekButton = this.getElementsByClassName('current-week')[0]
-        currentWeekButton.onclick = () => this.onCurrentWeekCallback()
+        setupEventDispatch(this, 'current-week', 'currentWeekSelected')
+        setupEventDispatch(this, 'time-sheet-history', "timeSheetHistorySelected")
+        setupEventDispatch(this, 'invoice-generator', 'invoiceGeneratorSelected')
 
-        const historyButton = this.getElementsByClassName('time-sheet-history')[0]
-        historyButton.onclick = () => this.onTimeSheetHistoryCallback()
+        function setupEventDispatch(t, button, event) {
+            t.getElementsByClassName(button)[0].onclick =
+                () => t.dispatchEvent(new Event(event))
+        }
     }
 }

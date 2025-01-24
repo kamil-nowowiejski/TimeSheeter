@@ -7,10 +7,7 @@ export default class TimeSheetHistory extends HTMLElement {
     async connectedCallback() {
         this.innerHTML = `
             <div>
-                <div class='month-picker-container'>
-                    <label for='month'>Month</label>
-                    <input id='month' type="month" class='month-picker'>
-                </div>
+                <month-picker class='month-picker'></month-picker>
 
                 <div class='weeks-container'>
                 </div>
@@ -25,7 +22,7 @@ export default class TimeSheetHistory extends HTMLElement {
                     width: 60vw;
                 }
 
-                .month-picker-container {
+                .month-picker {
                     margin-top: 20px;
                 }
 
