@@ -1,4 +1,5 @@
-import './styles.css'
+import './styles.module.css'
+import {  state } from './stateManager.js'
 import MonthPicker from './components/monthPicker.js';
 import TimeSheetDay from './components/TimeSheetDay.js';
 import TimeSheetTable from './components/TimeSheetTable.js';
@@ -8,7 +9,7 @@ import AggregatedStatsInfoModal from './components/history/AggregatedStatsInfoMo
 import TimeSheetHistory from './components/history/TimeSheetHistory.js'
 import TimeSheetMenu from './components/timeSheetMenu.js'
 import InvoiceGenerator from './components/invoiceGeneration/InvoiceGenerator.js';
-
+//fsgf
 customElements.define('month-picker', MonthPicker)
 customElements.define('time-sheet-day', TimeSheetDay)
 customElements.define('time-sheet-table', TimeSheetTable);
@@ -20,15 +21,13 @@ customElements.define('time-sheet-menu', TimeSheetMenu)
 customElements.define('invoice-generator', InvoiceGenerator)
 
 class WeeklyTimeSheet extends HTMLElement {
-    constructor() { super() }
+    constructor() { super(); }
 
     connectedCallback() {
         this.innerHTML = `
             <div class="flex-row">
                 <time-sheet-menu class='side-menu'></time-sheet-menu>
                 <div class='content-container'>
-                    <!-- <time-sheet-table class='time-sheet-table'></time-sheet-table> -->
-                    <invoice-generator></invoice-generator>
                 </div>
             </div>  
 
@@ -56,19 +55,47 @@ class WeeklyTimeSheet extends HTMLElement {
                 }
             </style>
             `
-
-        const menu = this.getElementsByClassName('side-menu')[0]
-        menu.addEventListener("timeSheetHistorySelected", () => this.showElement('time-sheet-history'))
-        menu.addEventListener('currentWeekSelected', () => this.showElement('time-sheet-table'))
-        menu.addEventListener('invoiceGeneratorSelected', () => this.showElement('invoice-generator'))
+        // if (stateManager.getSelectedTab() == 'time-sheet-table')
+        //     this.showElement('time-sheet-table')
+        // else if (stateManager.getSelectedTab() == 'time-sheet-history')
+        //     this.showElement('time-sheet-history')
+        // else if (stateManager.getSelectedTab() == 'invoice-generation')
+        //     this.showElement('invoice-generation')
+        //
+        // const menu = this.getElementsByClassName('side-menu')[0]
+        // menu.addEventListener("timeSheetHistorySelected", () => this.showElement('time-sheet-history'))
+        // menu.addEventListener('currentWeekSelected', () => this.showElement('time-sheet-table'))
+        // menu.addEventListener('invoiceGeneratorSelected', () => this.showElement('invoice-generator'))
+        // stateManager.logstate()
     }
-    
-    showElement(elementName){
+
+    showElement(elementName) {
         const contentContainer = this.getElementsByClassName('content-container')[0]
-        contentContainer.removeChild(contentContainer.children[0])
+        if (contentContainer.children.length > 0)
+            contentContainer.removeChild(contentContainer.children[0])
         const element = document.createElement(elementName)
         contentContainer.appendChild(element)
+        stateManager.setSelectedTab(elementName)
+        stateManager.logstate()
     }
 }
 
 customElements.define('weekly-time-sheet', WeeklyTimeSheet)
+
+function showElement(elementName) {
+    const contentContainer = document.getElementsByClassName('content-container')[0]
+    if (contentContainer.children.length > 0)
+        contentContainer.removeChild(contentContainer.children[0])
+    const element = document.createElement(elementName)
+    contentContainer.appendChild(element)
+}
+const menu = document.getElementsByClassName('side-menu')[0]
+menu.addEventListener("timeSheetHistorySelected", () => state.selectedTab = 'time-sheet-history')
+menu.addEventListener('currentWeekSelected', () => state.selectedTab = 'time-sheet-table')
+menu.addEventListener('invoiceGeneratorSelected', () => state.selectedTab = 'invoice-generator')
+
+showElement(state.selectedTab)
+//fsg
+
+
+

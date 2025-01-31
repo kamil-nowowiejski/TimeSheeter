@@ -13,6 +13,7 @@ public class TimeSpanJsonConverter : JsonConverter<TimeSpan?>
         var hours = int.Parse(split[0]);
         var minutes = int.Parse(split[1]);
         return TimeSpan.FromHours(hours) + TimeSpan.FromMinutes(minutes);
+        
     }
 
     public override void Write(Utf8JsonWriter writer, TimeSpan? value, JsonSerializerOptions options)

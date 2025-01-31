@@ -26,6 +26,21 @@ public class TimeSpanJsonConverterTest
 }";
 
         var dto = System.Text.Json.JsonSerializer.Deserialize<SaveTimeDto>(ss);
+
     }
 
+
+    [Theory]
+    [MemberData(nameof(Data))]
+    public void dfafa(string ss)
+    {
+
+    }
+
+    public static IEnumerable<object[]> Data => new List<object[]>{
+    new object[]{"stringal"},
+    new object[]{"fgal"},
+    new object[]{"ghlg"},
+    new object[]{"afsgd"},
+};
 }

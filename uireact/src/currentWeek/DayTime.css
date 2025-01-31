@@ -1,0 +1,56 @@
+.masterContainer {
+    margin-left: 20px;
+} 
+
+.masterContainer.locked {
+    background-color: lightGrey;
+}
+
+.masterContainer.valid {
+    background-color: transparent
+}
+
+.masterContainer.invalid {
+    background-color: lightCoral
+}
+.column {
+    display: flex;
+    flex-direction: column;
+}
+
+.padlockIcon {
+    cursor: pointer
+}
+
+.dayLabelContainer{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    align-content: center;
+}
+.lockButton{
+    border: none;
+    background-color: transparent;
+}
+
+.timeInput{
+    width: 100px;
+    height: 50px;
+    margin-bottom: 10px;
+}
+
+.dayLabel {
+    max-width: 100px;
+    height: 50px;
+    text-align: center;
+    line-height: 50px;
+}
+
+.workedHours{
+    width: 100px;
+    height: 50px;
+    text-align: center;
+    line-height: 50px;
+    margin-top: -10px;
+}

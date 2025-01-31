@@ -1,0 +1,44 @@
+.flex-row {
+    display:flex;
+    flex-direction: row;
+}
+
+.flex-column{
+    display: flex;
+    flex-direction: column;
+}
+
+.startFinishLabels {
+    display: flex;
+    flex-direction: column;
+    margin-top: 50px;
+}
+
+.timeLabel {
+    width: 100px;
+    height: 50px;
+    text-align: left;
+    line-height: 50px;
+    margin-bottom: 10px;
+    text-wrap: nowrap;
+}
+
+.hoursWorked{
+    width: 100px;
+    height: 50px;
+    text-align: left;
+    line-height: 50px;
+    text-wrap: nowrap;
+}
+
+.dayError {
+    color: red
+}
+
+.remainingTime{
+    margin-top: 20px;
+}
+
+.errors{
+    background-color: lightCoral;
+}

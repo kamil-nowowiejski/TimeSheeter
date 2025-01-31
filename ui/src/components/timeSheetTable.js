@@ -144,7 +144,7 @@ export default class TimeSheetTable extends HTMLElement {
         return dateForDay.toISOString()
     }
 
-    updateRemainingTime() {
+   updateRemainingTime() {
         const allWorkedTime = this._timeSheetDays
             .map(day => day.workedTime)
             .reduce((allTime, dayTime) => allTime + dayTime, 0)

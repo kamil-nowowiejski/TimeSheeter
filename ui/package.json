@@ -1,16 +1,15 @@
 {
+  "type": "module",
+  "private": true,
   "scripts": {
-    "build": "webpack --mode=production",
-    "watch": "webpack --watch --mode=development"
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
   },
   "dependencies": {
     "jspdf": "^2.5.2"
   },
   "devDependencies": {
-    "css-loader": "^7.1.2",
-    "npm-watch": "^0.13.0",
-    "style-loader": "^4.0.0",
-    "webpack": "^5.97.1",
-    "webpack-cli": "^6.0.1"
+    "vite": "^6.0.11"
   }
 }

@@ -2,12 +2,22 @@
 <html>
 
 <head>
+    <environment include="Development">
+        <script type="module">
+            import RefreshRuntime from "http://localhost:5174/@@react-refresh"
+            RefreshRuntime.injectIntoGlobalHook(window)
+            window.$RefreshReg$ = () => { }
+            window.$RefreshSig$ = () => (type) => type
+            window.__vite_plugin_react_preamble_installed__ = true
+        </script>
+        <script type="module" src="http://localhost:5174/@@vite/client"></script>
+        <script type="module" src="~/src/main.tsx"></script>
+    </environment>
     <script src="https://kit.fontawesome.com/dc69a46cdf.js" crossorigin="anonymous"></script>
-    <script src="~/static/main.js" type="module"></script>
 </head>
 
 <body>
-    <weekly-time-sheet></weekly-time-sheet>
+    <div id='root'></div>
 </body>
 
 </html>

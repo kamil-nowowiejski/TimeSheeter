@@ -21,6 +21,7 @@ public class WeeklyTimeSheetController : Controller
     public IActionResult Index()
     {
         return View("Features/WeeklyTimeSheet/View/Index.cshtml");
+    
     }
 
     /// <summary>

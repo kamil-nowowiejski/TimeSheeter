@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.FileProviders;
 using Server.Database;
 using Server.Features.WeeklyTimeSheet;
+using Vite.AspNetCore;
 
 namespace Server;
 
@@ -19,23 +19,32 @@ public class Program
             var dbPath = Path.Join(path, "timesheeter.db");
             options.UseSqlite($"Data Source={dbPath}");
         });
+        builder.Services.AddViteServices(options =>
+        {
+            options.Server.Host = "localhost";
+            options.Server.Port = 5174;
+            options.Server.AutoRun = true;
+            options.Server.Https = false;
+            options.Server.PackageDirectory = "../uireact";
+            options.Server.UseReactRefresh = true;
+            options.Base = "assets";
+        });
 
         AddApplicationServices(builder.Services);
 
         var app = builder.Build();
 
         MigrateDatabase(app.Services);
-        Console.WriteLine("dffds");
-        Console.WriteLine(Path.Combine(builder.Environment.ContentRootPath, "../ui/dist"));
 
-        app.UseStaticFiles(new StaticFileOptions
-        {
-            FileProvider = new PhysicalFileProvider(
-                    Path.Combine(builder.Environment.ContentRootPath, "../ui/dist")),
-            RequestPath = "/static"
-        });
+        app.UseStaticFiles();
 
         app.MapControllers();
+
+        if (app.Environment.IsDevelopment())
+        {
+            app.UseWebSockets();
+            app.UseViteDevelopmentServer(true);
+        }
 
         app.Run();
     }
