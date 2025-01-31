@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import './App.css'
-import  CurrentWeek  from './currentWeek/CurrentWeek.tsx'
+import  CurrentWeek  from './currentWeek/CurrentWeekElement.tsx'
 import { SideMenu } from './sideMenu/SideMenu.tsx'
 
 enum tabs {

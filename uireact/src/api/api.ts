@@ -1,71 +1,21 @@
-export async function getCurrentWeekTime(): Promise<CurrentWeekTime> {
+import { CurrentWeek, WorkDay, WorkTimestamp } from "../currentWeek/models";
+export async function getCurrentWeekTime(): Promise<CurrentWeek> {
     const response = await fetch('weeklytimesheet/getcurrentweektime');
     const text = await response.text();
     const dto = JSON.parse(text);
-    return new CurrentWeekTimeImp(dto.monday, dto.tuesday, dto.wendsday, dto.thrusday, dto.friday)
+    return new CurrentWeek(
+        toModel(1, dto.monday),
+        toModel(2, dto.tuesday),
+        toModel(3, dto.wendsday),
+        toModel(4, dto.thrusday),
+        toModel(5, dto.friday))
+
+    function toModel(dayIndex: number, dto: { startTime: string, finishTime: string }) {
+        return new WorkDay(dayIndex, WorkTimestamp.fromString(dto.startTime), WorkTimestamp.fromString(dto.finishTime))
+    }
 }
 
-export async function saveTime(): Promise<void>{
+export async function saveTime(): Promise<void> {
     throw 'not implemented'
 }
 
-export interface CurrentWeekTime {
-    monday: DayTime;
-    tuesday: DayTime;
-    wendsday: DayTime;
-    thrusday: DayTime;
-    friday: DayTime;
-
-    toArray(): DayTime[];
-    getDay(dayIndex: number): DayTime
-    updateTime(dayIndex: number, startTime: string | null, finishTime: string | null): CurrentWeekTime;
-}
-
-export interface DayTime {
-    date: string;
-    startTime: string | null;
-    finishTime: string | null;
-}
-
-
-class CurrentWeekTimeImp implements CurrentWeekTime {
-    constructor(monday: DayTime, tuesday: DayTime, wendsday: DayTime, thrusday: DayTime, friday: DayTime) {
-        this.monday = monday;
-        this.tuesday = tuesday;
-        this.wendsday = wendsday;
-        this.thrusday = thrusday;
-        this.friday = friday
-    }
-    monday: DayTime;
-    tuesday: DayTime;
-    wendsday: DayTime;
-    thrusday: DayTime;
-    friday: DayTime;
-
-    toArray(): DayTime[] {
-        return [this.monday, this.tuesday, this.wendsday, this.thrusday, this.friday]
-    }
-
-    getDay(dayIndex: number): DayTime {
-        switch (dayIndex) {
-            case 1: return this.monday;
-            case 2: return this.tuesday;
-            case 3: return this.wendsday;
-            case 4: return this.thrusday;
-            case 5: return this.friday;
-        }
-
-        throw "Invalid day index"
-    }
-
-    updateTime(
-        dayIndex: number,
-        startTime: string | null, 
-        finishTime: string | null): CurrentWeekTime {
-        const day = this.getDay(dayIndex)
-        day.startTime = startTime;
-        day.finishTime = finishTime
-        return new CurrentWeekTimeImp(this.monday, this.tuesday, this.wendsday, this.thrusday, this.friday)
-    }
-
-}
