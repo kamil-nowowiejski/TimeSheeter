@@ -15,7 +15,33 @@ export async function getCurrentWeekTime(): Promise<CurrentWeek> {
     }
 }
 
-export async function saveTime(): Promise<void> {
-    throw 'not implemented'
+export async function saveTime(workDay: WorkDay): Promise<void> {
+    const body = {
+        date: toUtcDate(workDay.dayIndex),
+        startTime: workDay.startTime?.toString(),
+        finishTime: workDay.finishTime?.toString()
+    }
+
+    const params = {
+        headers: { "content-type": "application/json" },
+        method: "POST",
+        body: JSON.stringify(body)
+    }
+
+    await fetch('/weeklytimesheet/savetime', params)
+        .catch(error => console.error(error))
+
+    function toUtcDate(dayIndex: number) {
+        const currentDay = new Date()
+        const dateForDay = getDateForDayOfWeek(dayIndex, currentDay)
+        return dateForDay.toISOString()
+    }
+
+    function getDateForDayOfWeek(dayIndex:number, currentDate: Date) {
+        const currentDay = currentDate.getDay();
+        const dayDifference = dayIndex - currentDay;
+        const timeDifference = dayDifference * 1000 * 60 * 60 * 24;
+        return new Date(currentDate.getTime() + timeDifference);
+    }
 }
 

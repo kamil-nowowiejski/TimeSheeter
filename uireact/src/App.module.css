@@ -6,7 +6,7 @@ body {
     background-color: lightCyan;
     margin: 0;
 }
-.flex-row {
+.flexRow {
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;
@@ -14,7 +14,7 @@ body {
     height: 100%;
 }
 
-.content-container {
+.contentContainer {
     flex: 1;
     margin-top: 8px;
     margin-left: 8px;

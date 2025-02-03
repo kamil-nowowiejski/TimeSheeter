@@ -1,0 +1,23 @@
+.errors{
+    display: flex;
+    flex-direction: column;
+    background-color: green;
+    width: max-content;
+    background-color: lightCoral;
+    margin-top: 10px;
+
+}
+
+.errorLabelTitle{
+    width: fit-content;
+    padding-left: 10px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+.errorLabel{
+    width: fit-content;
+    padding-left: 20px;
+    padding-bottom: 10px;
+    padding-right: 20px;
+}
+

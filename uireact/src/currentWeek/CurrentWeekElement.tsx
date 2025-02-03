@@ -1,16 +1,13 @@
-import './CurrentWeekElement.css'
+import styles from './CurrentWeekElement.module.css'
 import { useState, useEffect, useReducer } from 'react'
 import { getCurrentWeekTime } from '../api/api.ts'
 import WorkDayElement from './WorkDayElement.tsx'
-import { CurrentWeek, WorkTimeDuration, WorkDay, DayErrors } from './models.ts'
+import { CurrentWeek, WorkTimeDuration, WorkDay } from './models.ts'
 import CurrentWeekErrorsElement from './CurrentWeekErrorsElement.tsx'
 
 export default function CurrentWeekElement() {
 
     const [currentWeek, setCurrentWeek] = useState<CurrentWeek>()
-    const [dayErrors, dispatchDayError] = useReducer(
-        (dayErrors: DayErrors, event: DayErrorEvent) => dayErrors.update(event.workDay, event.error),
-        new DayErrors([]))
 
     useEffect(() => {
         getCurrentWeekTime().then(weekTime => setCurrentWeek(weekTime))
@@ -19,12 +16,12 @@ export default function CurrentWeekElement() {
     const currentDate = new Date()
 
     return (
-        <div className='flex-column'>
-            <div className="flex-row">
-                <div className="startFinishLabels">
-                    <label className="timeLabel">Start Time</label>
-                    <label className="timeLabel">Finish Time</label>
-                    <label className="hoursWorked">Hours Worked</label>
+        <div className={styles.flexColumn}>
+            <div className={styles.flexRow}>
+                <div className={styles.startFinishLabels}>
+                    <label className={styles.timeLabel}>Start Time</label>
+                    <label className={styles.timeLabel}>Finish Time</label>
+                    <label className={styles.hoursWorked}>Hours Worked</label>
                 </div>
 
                 {(currentWeek?.toArray() ?? [])
@@ -33,21 +30,17 @@ export default function CurrentWeekElement() {
                             key={dayIndex + 1}
                             workDay={workDay}
                             currentDate={currentDate}
-                            onError={(workDay, error) => {
-                                dispatchDayError({ workDay: workDay, error: error })
+                            isValid={workDay.error === undefined}
+                            onInput={updatedWorkDay => {
+                                setCurrentWeek(currentWeek!.update(updatedWorkDay))
                             }}
                         />
                     ))}
             </div>
-            <label className='remainingTime'>Remaining time: {calculateRemeainingTime(currentWeek)}</label>
-            <CurrentWeekErrorsElement errors={dayErrors} />
+            <label className={styles.remainingTime}>Remaining time: {calculateRemeainingTime(currentWeek)}</label>
+            <CurrentWeekErrorsElement workDays={currentWeek?.toArray()} />
         </div>
     )
-}
-
-interface DayErrorEvent{
-    workDay: WorkDay;
-    error: string | undefined;
 }
 
 

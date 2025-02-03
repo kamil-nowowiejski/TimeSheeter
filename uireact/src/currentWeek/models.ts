@@ -1,19 +1,25 @@
-import { convertTimeToMinutes, timeInMinutesToString, getTimeDifferenceInMinutes } from "../helpers/timeHelpers";
+import { convertTimeToMinutes, timeInMinutesToString } from "../helpers/timeHelpers";
 import { getShortDayName, getLongDayName } from '../helpers/dayNames.ts'
 
 export class WorkDay {
     private _dayIndex: number;
     private _startTime: WorkTimestamp | undefined;
     private _finishTime: WorkTimestamp | undefined
+    private _error: string | undefined;
 
     public get dayIndex() { return this._dayIndex; }
     public get startTime() { return this._startTime }
     public get finishTime() { return this._finishTime }
+    public get error() { return this._error }
 
-    constructor(dayIndex: number, startTime: WorkTimestamp | undefined, finishTime: WorkTimestamp | undefined) {
+    constructor(
+        dayIndex: number,
+        startTime: WorkTimestamp | undefined,
+        finishTime: WorkTimestamp | undefined) {
         this._dayIndex = dayIndex
         this._startTime = startTime
         this._finishTime = finishTime
+        this._error = this.getValidationError()
     }
 
     public updateStartTime(time: WorkTimestamp | undefined) {
@@ -44,6 +50,17 @@ export class WorkDay {
 
     public getShortWeekDayName() {
         return getShortDayName(this._dayIndex)
+    }
+
+    private getValidationError(): string | undefined {
+
+        if (this.startTime === undefined || this.finishTime === undefined)
+            return undefined
+
+        if (this.finishTime.minutes <= this.startTime.minutes)
+            return 'Finish time must be greater than start time'
+
+        return undefined
     }
 }
 
@@ -101,52 +118,3 @@ export class CurrentWeek {
         return new CurrentWeek(updatedDays[0], updatedDays[1], updatedDays[2], updatedDays[3], updatedDays[4])
     }
 }
-
-export interface DayError {
-    workDay: WorkDay;
-    error: string;
-}
-
-export class DayErrors {
-    private _errors: DayError[];
-
-    constructor(errors: DayError[]) {
-        this._errors = errors
-    }
-
-    public get errors() { return [...this._errors] }
-
-
-    public update(workDay: WorkDay, error: string | undefined): DayErrors {
-        const index = this._errors.findIndex(dayError => dayError.workDay.dayIndex === workDay.dayIndex)
-
-        if (index === -1) {
-            if (error === undefined)
-                return this
-
-            this._errors.push({ workDay: workDay, error: error })
-            sortErrors(this)
-        }
-
-        if (error === undefined) { 
-            const updatedErrors = [... this._errors]
-            updatedErrors.splice(index, 1)
-            return new DayErrors(updatedErrors)
-        }
-
-        const updatedWorkDay = {
-            workDay: workDay,
-            error: error!
-        }
-
-        const updatedErrors = [...this._errors]
-        updatedErrors[index] = updatedWorkDay
-        return new DayErrors(updatedErrors)
-
-
-        function sortErrors(thisRef: DayErrors) {
-            thisRef._errors.sort((a, b) => a.workDay.dayIndex < b.workDay.dayIndex ? -1 : 1)
-        }
-    }
-}
-

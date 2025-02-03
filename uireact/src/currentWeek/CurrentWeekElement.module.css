@@ -1,9 +1,9 @@
-.flex-row {
+.flexRow {
     display:flex;
     flex-direction: row;
 }
 
-.flex-column{
+.flexColumn{
     display: flex;
     flex-direction: column;
 }
@@ -40,5 +40,5 @@
 }
 
 .errors{
-    background-color: lightCoral;
+    background-color: green;
 }
