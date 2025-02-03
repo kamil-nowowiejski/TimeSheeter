@@ -128,8 +128,11 @@ export class DayErrors {
             sortErrors(this)
         }
 
-        if (error === undefined)
-            this._errors.splice(index, 1)
+        if (error === undefined) { 
+            const updatedErrors = [... this._errors]
+            updatedErrors.splice(index, 1)
+            return new DayErrors(updatedErrors)
+        }
 
         const updatedWorkDay = {
             workDay: workDay,
