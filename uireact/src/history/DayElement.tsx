@@ -20,7 +20,7 @@ export default function DayElement(props: DayElementProps) {
     return (
         <div className={`${styles.dayContainer} ${styleClass}`} style={props.style}>
             <label className={styles.dayLabel}>{getDayLabel(props.workDay)}</label>
-            <label className={styles.dayLabel}>{getWorkedHours(props.workDay)}</label>
+            <label className={styles.dayLabel}>{getWorkedHours(props.workDay, props.currentDate)}</label>
         </div>
     )
 }
@@ -50,8 +50,8 @@ function getDayLabel(workDay: WorkDay) {
     return workDay.getShortWeekDayName() + ' ' + workDay.date.getDate()
 }
 
-function getWorkedHours(workDay: WorkDay) {
-    if (isWeekend(workDay))
+function getWorkedHours(workDay: WorkDay, currentDate: Date) {
+    if (isWeekend(workDay) || isFutureDay(workDay, currentDate))
         return ''
 
     const workingTime = workDay.getWorkingTime()
