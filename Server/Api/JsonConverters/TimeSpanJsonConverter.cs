@@ -1,6 +1,8 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
+namespace Server.Api.JsonConverters;
+
 public class TimeSpanJsonConverter : JsonConverter<TimeSpan?>
 {
     public override TimeSpan? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
@@ -18,7 +20,13 @@ public class TimeSpanJsonConverter : JsonConverter<TimeSpan?>
 
     public override void Write(Utf8JsonWriter writer, TimeSpan? value, JsonSerializerOptions options)
     {
-        throw new NotImplementedException();
+        if(value == null)
+            return;
+
+        var hours = value.Value.Hours.ToString("00");
+        var minutes = value.Value.Minutes.ToString("00");
+        var stringValue = $"{hours}:{minutes}";
+        writer.WriteStringValue(stringValue);
     }
 }
         

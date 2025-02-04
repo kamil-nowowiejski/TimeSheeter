@@ -1,0 +1,44 @@
+.dayContainer {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    margin: 10px;
+    height: 60px;
+    width: 90px;
+    border-style: solid;
+    border-width: 2px;
+    border-color: grey;
+    border-radius: 5px;
+}
+
+.weekend {
+    background-color: lightGray;
+}
+
+.freeDay {
+    background-color: moccasin;
+}
+
+.invalid{
+    background-color: lightCoral;
+}
+
+.regularPastDay {
+    background-color: paleGreen;
+}
+
+.currentDay {
+    background-color: whiteSmoke;
+    border-color: plum;
+    border-style: outset;
+    border-width: 5px;
+}
+
+.futureDay {
+    background-color: whiteSmoke;
+}
+
+.dayLabel {
+    padding: 5px;
+    text-align: center;
+}

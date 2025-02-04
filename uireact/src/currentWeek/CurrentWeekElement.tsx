@@ -1,8 +1,7 @@
 import styles from './CurrentWeekElement.module.css'
 import { useState, useEffect } from 'react'
-import { getCurrentWeekTime } from './api.ts'
 import WorkDayElement from './WorkDayElement.tsx'
-import { CurrentWeek } from './models.ts'
+import { CurrentWeek, getCurrentWeek } from './models.ts'
 import { WorkTimeDuration } from '../common/models.ts'
 import CurrentWeekErrorsElement from './CurrentWeekErrorsElement.tsx'
 
@@ -11,7 +10,7 @@ export default function CurrentWeekElement() {
     const [currentWeek, setCurrentWeek] = useState<CurrentWeek>()
 
     useEffect(() => {
-        getCurrentWeekTime().then(weekTime => setCurrentWeek(weekTime))
+        getCurrentWeek().then(weekTime => setCurrentWeek(weekTime))
     }, [])
 
     const currentDate = new Date()

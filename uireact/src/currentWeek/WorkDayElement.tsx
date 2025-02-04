@@ -1,7 +1,7 @@
 import styles from './WorkDayElement.module.css'
 import { useState } from 'react'
-import { saveTime } from './api';
 import { WorkDay, WorkTimestamp } from '../common/models.ts';
+import WorkDaysApi from '../apis/workDaysApi.ts';
 
 interface WorkDayElementProps {
     workDay: WorkDay,
@@ -12,7 +12,7 @@ interface WorkDayElementProps {
 
 export default function WorkDayElement(props: WorkDayElementProps) {
 
-    const [isLocked, setIsLocked] = useState<boolean>(props.workDay.date < props.currentDate)
+    const [isLocked, setIsLocked] = useState<boolean>(isPastDay(props.workDay, props.currentDate))
 
     const onStartTimeInput = (e: React.ChangeEvent<HTMLInputElement>) =>
         onTimeInput(props.workDay.updateStartTime(WorkTimestamp.fromString(e.target.value)), props.onInput);
@@ -50,7 +50,7 @@ async function onTimeInput(
     workDay: WorkDay,
     onInput: (updatedWorkDay: WorkDay) => void) {
     onInput(workDay)
-    await saveTime(workDay)
+    await new WorkDaysApi().saveWorkDay(workDay)
 }
 
 function getWorkedHours(workDay: WorkDay): string {
@@ -64,4 +64,10 @@ function getLabel(workDay: WorkDay): string {
     return workDay.getShortWeekDayName() + ' ' + workDay.date.getDate()
 
 
+}
+function isPastDay(workDay: WorkDay, currentDate: Date): boolean {
+    if (workDay.date.getFullYear() < currentDate.getFullYear()) return true;
+    if (workDay.date.getMonth() < currentDate.getMonth()) return true
+    if (workDay.date.getDate() < currentDate.getDate()) return true
+    return false
 }

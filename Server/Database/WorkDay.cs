@@ -5,7 +5,7 @@ namespace Server.Database;
 public class WorkDay
 {
     [Key]
-    public DateTime Date {get;set;}
+    public DateOnly Date {get;set;}
     public TimeSpan? StartTime { get; set; } 
     public TimeSpan? FinishTime { get; set; }
 }

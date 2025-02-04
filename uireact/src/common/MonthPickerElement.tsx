@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Month } from './models';
 
 export interface MonthPickerProps {
     defaultValue: Month | undefined;
@@ -35,30 +36,3 @@ function toDefaultValue(month: Month | undefined) {
     return month === undefined ? undefined : month.year + '-' + month.month
 }
 
-export class Month {
-    private _month: number;
-    private _year: number;
-
-    public get month() { return this._month }
-    public get year() { return this._year }
-
-    constructor(month: number, year: number) {
-        this._month = month;
-        this._year = year
-    }
-
-    public getDate(day: number): Date {
-        if (day > 0) {
-            const stringDate = this.year + '-' + this.month + '-' + day
-            return new Date(Date.parse(stringDate))
-        }
-
-        return new Date(this.year, this.month, day)
-    }
-
-    public update(month: number, year: number): Month {
-        if (this.month == month && this.year == year)
-            return this
-        return new Month(month, year)
-    }
-}

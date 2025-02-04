@@ -129,6 +129,47 @@ export class WorkTimeDuration {
     }
 }
 
+export class Earnings {
+    private _earningsPerHour: number;
+    private _currency: string;
+
+    public get earningsPerHour() { return this._earningsPerHour }
+    public get currency() { return this._currency }
+
+    constructor(earningsPerHour: number, currency: string) {
+        this._currency = currency;
+        this._earningsPerHour = earningsPerHour
+    }
+
+}
+
+export class Month {
+    private _month: number;
+    private _year: number;
+
+    public get month() { return this._month }
+    public get year() { return this._year }
+
+    constructor(month: number, year: number) {
+        this._month = month;
+        this._year = year
+    }
+
+    public getDate(day: number): Date {
+        if (day > 0) {
+            const stringDate = this.year + '-' + this.month + '-' + day
+            return new Date(Date.parse(stringDate))
+        }
+
+        return new Date(this.year, this.month, day)
+    }
+
+    public update(month: number, year: number): Month {
+        if (this.month == month && this.year == year)
+            return this
+        return new Month(month, year)
+    }
+}
 function timeInMinutesToString(workTimeMinutes: number): string {
     const workHours = Math.floor(workTimeMinutes / 60);
     const workMinutes = workTimeMinutes - workHours * 60;
