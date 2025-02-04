@@ -8,7 +8,6 @@ export default defineConfig({
         host: "localhost",
         port: 5174,
         strictPort: true,
-        https: false,
     },
     build: {
         outDir: '../../Server/wwwroot',

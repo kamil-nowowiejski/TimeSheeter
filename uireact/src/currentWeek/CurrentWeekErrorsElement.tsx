@@ -1,5 +1,5 @@
 import styles from './CurrentWeekErrorsElement.module.css'
-import { WorkDay } from './models.ts'
+import { WorkDay } from '../common/models.ts'
 
 interface CurrentWeekErrorsElementProps {
     workDays: WorkDay[] | undefined;
@@ -33,7 +33,7 @@ function getErrorMessage(workDay: WorkDay): ErrorProps | undefined {
 
     const weekDay = workDay.getLongWeekDayName()
     const error ='• ' +weekDay + ': ' + workDay.error
-    return { key: workDay.dayIndex, error: error }
+    return { key: workDay.dayOfWeek, error: error }
 }
 
 

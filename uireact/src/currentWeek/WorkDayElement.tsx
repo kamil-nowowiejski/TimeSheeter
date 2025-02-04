@@ -1,8 +1,7 @@
 import styles from './WorkDayElement.module.css'
 import { useState } from 'react'
-import { getShortDayName } from '../helpers/dayNames.ts'
-import { saveTime } from '../api/api';
-import { WorkDay, WorkTimestamp } from './models.ts';
+import { saveTime } from './api';
+import { WorkDay, WorkTimestamp } from '../common/models.ts';
 
 interface WorkDayElementProps {
     workDay: WorkDay,
@@ -13,7 +12,7 @@ interface WorkDayElementProps {
 
 export default function WorkDayElement(props: WorkDayElementProps) {
 
-    const [isLocked, setIsLocked] = useState<boolean>(props.workDay.dayIndex < props.currentDate.getDay())
+    const [isLocked, setIsLocked] = useState<boolean>(props.workDay.date < props.currentDate)
 
     const onStartTimeInput = (e: React.ChangeEvent<HTMLInputElement>) =>
         onTimeInput(props.workDay.updateStartTime(WorkTimestamp.fromString(e.target.value)), props.onInput);
@@ -32,7 +31,7 @@ export default function WorkDayElement(props: WorkDayElementProps) {
     return (
         <div className={classNames.join(" ")}>
             <div className={styles.dayLabelContainer}>
-                <label className={styles.dayLabel}>{getLabel(props.workDay.dayIndex, props.currentDate)}</label>
+                <label className={styles.dayLabel}>{getLabel(props.workDay)}</label>
                 <button className={styles.lockButton} type='button' style={(isLocked) ? {} : { display: 'none' }} onClick={_ => setIsLocked(false)}>
                     <i className={`${styles.padlockIcon} fa-solid fa-lock`}></i>
                 </button>
@@ -61,15 +60,8 @@ function getWorkedHours(workDay: WorkDay): string {
     return workTimeDuration.toString()
 }
 
-function getLabel(dayIndex: number, currentDate: Date): string {
-    const dateForDayIndex = getDateForDayOfWeek(dayIndex, currentDate);
-    const dayOfWeekLabel = getShortDayName(dayIndex);
-    return dayOfWeekLabel + " " + dateForDayIndex.getDate();
-}
+function getLabel(workDay: WorkDay): string {
+    return workDay.getShortWeekDayName() + ' ' + workDay.date.getDate()
 
-function getDateForDayOfWeek(dayIndex: number, currentDate: Date): Date {
-    const currentDay = currentDate.getDay();
-    const dayDifference = dayIndex - currentDay;
-    const timeDifference = dayDifference * 1000 * 60 * 60 * 24;
-    return new Date(currentDate.getTime() + timeDifference);
+
 }

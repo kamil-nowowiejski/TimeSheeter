@@ -1,8 +1,9 @@
 import styles from './CurrentWeekElement.module.css'
-import { useState, useEffect, useReducer } from 'react'
-import { getCurrentWeekTime } from '../api/api.ts'
+import { useState, useEffect } from 'react'
+import { getCurrentWeekTime } from './api.ts'
 import WorkDayElement from './WorkDayElement.tsx'
-import { CurrentWeek, WorkTimeDuration, WorkDay } from './models.ts'
+import { CurrentWeek } from './models.ts'
+import { WorkTimeDuration } from '../common/models.ts'
 import CurrentWeekErrorsElement from './CurrentWeekErrorsElement.tsx'
 
 export default function CurrentWeekElement() {

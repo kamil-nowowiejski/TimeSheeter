@@ -2,6 +2,7 @@ import { useState } from 'react'
 import styles from './App.module.css'
 import CurrentWeek from './currentWeek/CurrentWeekElement.tsx'
 import { SideMenu } from './sideMenu/SideMenu.tsx'
+import TimeSheetHistory from './history/TimeSheetHistoryElement.tsx'
 
 enum tabs {
     currentWeek,
@@ -11,7 +12,7 @@ enum tabs {
 
 
 export default function App() {
-    const [selectedTab, setSelectedTab] = useState(tabs.currentWeek)
+    const [selectedTab, setSelectedTab] = useState(tabs.timeSheetHistory)
 
     return (
         <div className={styles.flexRow}>
@@ -27,8 +28,11 @@ export default function App() {
 }
 
 function getCurrentTab(selectedTab: tabs) {
-    if (selectedTab === tabs.currentWeek)
-        return <CurrentWeek />
+    switch (selectedTab) {
+        case tabs.currentWeek: return <CurrentWeek />
+        case tabs.timeSheetHistory: return <TimeSheetHistory />
+        default: break;
+    }
 }
 
 
