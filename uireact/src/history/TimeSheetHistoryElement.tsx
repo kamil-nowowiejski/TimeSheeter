@@ -19,7 +19,7 @@ export default function TimeSheetHistoryElement() {
 
     return (
         <div>
-            <MonthPicker className={styles.monthPicker} onInput={m => setMonth(m)} defaultValue={month} />
+            <MonthPicker className={styles.monthPicker} onInput={m => { setMonth(m) }} defaultValue={month} />
 
             <div className={styles.weeksContainer}>
 
@@ -65,7 +65,7 @@ function getWeeksGrid(monthHistory: MonthHistory | undefined): [JSX.Element[], n
         let column = 1
         for (const day of week.days) {
             const dayElement = day === undefined
-                ? (<EmptyDayElement />)
+                ? (<EmptyDayElement key={getKey(row, column)} />)
                 : (<DayElement
                     key={getKey(row, column)}
                     style={{ gridColumn: column, gridRow: row }}

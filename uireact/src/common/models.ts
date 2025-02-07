@@ -151,6 +151,8 @@ export class Month {
     public get year() { return this._year }
 
     constructor(month: number, year: number) {
+        this.validateMonth(month)
+        this.validateYear(year)
         this._month = month;
         this._year = year
     }
@@ -169,6 +171,17 @@ export class Month {
             return this
         return new Month(month, year)
     }
+
+    private validateMonth(month: number) {
+        if (month >= 1 && month <= 12)
+            return
+        throw new Error("Month value is invalid: " + month);
+    }
+    private validateYear(year: number) {
+        if (year >= 1)
+            return
+        throw new Error("Year value is invalid: " + year);
+    }
 }
 function timeInMinutesToString(workTimeMinutes: number): string {
     const workHours = Math.floor(workTimeMinutes / 60);
@@ -177,4 +190,3 @@ function timeInMinutesToString(workTimeMinutes: number): string {
     const minutesString = String(workMinutes).padStart(2, '0')
     return hoursString + ":" + minutesString;
 }
-

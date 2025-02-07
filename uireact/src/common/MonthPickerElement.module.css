@@ -1,1 +1,31 @@
+.masterContainer {
+    display: flex;
+    flex-direction: row;
+    border: solid;
+    border-color: green;
+    max-width: fit-content;
+    font-size: 1.1vw;
+    background-color: ghostwhite;
+}
 
+.separator {
+    background-color: transparent;
+    padding-left: 5px;
+    padding-right: 5px;
+}
+
+.inputElement {
+    background-color: transparent;
+    border: none;
+    font-size: 1.1vw;
+}
+
+.inputElement.month {
+    width: 30px;
+    text-align: right;
+}
+
+.inputElement.year {
+    width: 50px;
+    text-align: left;
+}
