@@ -1,8 +1,9 @@
 import { defineConfig } from 'vite'
+import deno from '@deno/vite-plugin'
 import react from '@vitejs/plugin-react'
 
 export default defineConfig({
-    plugins: [react()],
+    plugins: [deno(), react()],
     appType: 'custom',
     server: {
         host: "localhost",

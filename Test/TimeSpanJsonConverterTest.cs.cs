@@ -17,6 +17,8 @@ public class TimeSpanJsonConverterTest
     }
 
     [Fact]
+
+
     public void xd2()
     {
         var ss = @"{
@@ -32,7 +34,7 @@ public class TimeSpanJsonConverterTest
 
     [Theory]
     [MemberData(nameof(Data))]
-    public void dfafa(string ss)
+    public void dfafa()
     {
 
     }

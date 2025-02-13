@@ -3,6 +3,7 @@ import styles from './App.module.css'
 import CurrentWeek from './currentWeek/CurrentWeekElement.tsx'
 import { SideMenu } from './sideMenu/SideMenu.tsx'
 import TimeSheetHistory from './history/TimeSheetHistoryElement.tsx'
+import React from 'react';
 
 enum tabs {
     currentWeek,
