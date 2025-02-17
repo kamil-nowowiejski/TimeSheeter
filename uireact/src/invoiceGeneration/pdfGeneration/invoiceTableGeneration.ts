@@ -1,35 +1,37 @@
 import { jsPDF } from 'jspdf'
 import { ElementBoundingBox, InvoiceDocData, TableHeader } from './models/internal.ts'
-import { InvoiceItem } from './models/input.ts'
-import { getTextDimensions, TextDimensions } from './utils.ts'
+import { Invoice, InvoiceAggregate, InvoiceItem } from './models/input.ts'
+import { getTextSize, TextSize } from './utils.ts'
+import { setDrawing, setFont } from './models/extensions.ts'
+import { Font } from './models/templateDefintion.ts'
 
 export function generateItemsTable(
     doc: jsPDF,
-    invoiceDocData: InvoiceDocData,
-    invoiceItems: InvoiceItem[],
+    docInfo: InvoiceDocData,
+    invoice: Invoice,
     invoiceTitleBoundingBox: ElementBoundingBox,
 ) {
-    const headersBoundingBox = generateItemsTableHeaders(doc, invoiceDocData, invoiceTitleBoundingBox)
-    generateItems(doc, invoiceDocData, headersBoundingBox, invoiceItems)
+    const headersBoundingBox = generateItemsTableHeaders(doc, docInfo, invoiceTitleBoundingBox)
+    const itemsBoundingBox = generateItems(doc, docInfo, headersBoundingBox, invoice.items)
+    const aggregateBoundingBox = generateAggregate(doc, docInfo, itemsBoundingBox, invoice.aggregate)
 }
 
 function generateItemsTableHeaders(
     doc: jsPDF,
-    invoiceDocData: InvoiceDocData,
+    docInfo: InvoiceDocData,
     invoiceTitleBoundingBox: ElementBoundingBox,
 ): ElementBoundingBox {
     //define table boundaries
-    const startX = invoiceDocData.margins.horizontal
-    const finishX = invoiceDocData.pageWidth - invoiceDocData.margins.horizontal
+    const startX = docInfo.margins.horizontal
+    const finishX = docInfo.pageWidth - docInfo.margins.horizontal
     const tableWidth = finishX - startX
     const verticalSpace = 1
     const y = invoiceTitleBoundingBox.y + invoiceTitleBoundingBox.height + verticalSpace
 
     //calculate header row height
-    const tableHeaderHeight = getTextDimensions(doc, invoiceDocData.tableHeaders[0].text).totalHeight * 1.5
-    doc.setFillColor(200, 200, 200)
-    doc.setDrawColor(0, 0, 0)
-    doc.rect(startX, y, tableWidth, tableHeaderHeight, 'FD')
+    const tableHeaderHeight = getTextSize(doc, docInfo.itemsTable.headers[0].text).height * 1.1
+    setDrawing(doc, docInfo.itemsTable.drawing)
+    doc.rect(startX, y, tableWidth, tableHeaderHeight, 'DF')
 
     //draw vertical lines
     let verticalLineX = startX
@@ -37,19 +39,19 @@ function generateItemsTableHeaders(
     const verticalLineFinishY = y + tableHeaderHeight
     doc.line(verticalLineX, verticalLineStartY, verticalLineX, verticalLineFinishY)
 
-    invoiceDocData.tableHeaders.forEach((header) => {
+    docInfo.itemsTable.headers.forEach((header) => {
         verticalLineX = verticalLineX + header.size
         doc.line(verticalLineX, verticalLineStartY, verticalLineX, verticalLineFinishY)
     })
 
     //populate text
-    doc.setFontSize(10)
+    setFont(doc, docInfo.itemsTable.headersFont)
     let textBoundryLeft = startX
-    invoiceDocData.tableHeaders.forEach((header) => {
+    docInfo.itemsTable.headers.forEach((header) => {
         const textBoundryRight = textBoundryLeft + header.size
         const possibleTextWidth = textBoundryRight - textBoundryLeft
 
-        const textY = y + (tableHeaderHeight - getTextDimensions(doc, header.text).totalHeight) / 2 + 1
+        const textY = y + (tableHeaderHeight - getTextSize(doc, header.text).height) / 2 + 1
         const textSplit = doc.splitTextToSize(header.text, possibleTextWidth)
         doc.text(textSplit, textBoundryLeft + possibleTextWidth / 2, textY, {
             align: 'center',
@@ -73,30 +75,39 @@ function generateItems(
     invoiceDocData: InvoiceDocData,
     headersRect: ElementBoundingBox,
     invoiceItems: InvoiceItem[],
-) {
+): ElementBoundingBox {
+    let totalHeight = 0
     let previousItemRect = headersRect
     invoiceItems.forEach((item) => {
         previousItemRect = generateItem(doc, invoiceDocData, item, previousItemRect)
+        totalHeight += previousItemRect.height
     })
+
+    return {
+        x: headersRect.x,
+        y: headersRect.y + headersRect.height,
+        width: previousItemRect.width,
+        height: totalHeight,
+    }
 }
 
 function generateItem(
     doc: jsPDF,
-    invoiceDocData: InvoiceDocData,
+    docInfo: InvoiceDocData,
     item: InvoiceItem,
     previousItemRect: ElementBoundingBox,
 ): ElementBoundingBox {
     let takenSpace = previousItemRect.x
     const items: InvoiceItemData[] = [
-        { header: invoiceDocData.tableHeaders[0], text: item.key.toString() },
-        { header: invoiceDocData.tableHeaders[1], text: item.description, leftAlign: true },
-        { header: invoiceDocData.tableHeaders[2], text: item.unit },
-        { header: invoiceDocData.tableHeaders[3], text: item.amount.toString() },
-        { header: invoiceDocData.tableHeaders[4], text: toMoneyFormat(item.netPrice) },
-        { header: invoiceDocData.tableHeaders[5], text: toMoneyFormat(item.netValue) },
-        { header: invoiceDocData.tableHeaders[6], text: toPercentage(item.vatRate) },
-        { header: invoiceDocData.tableHeaders[7], text: toMoneyFormat(item.vatValue) },
-        { header: invoiceDocData.tableHeaders[8], text: toMoneyFormat(item.grossValue) },
+        { header: docInfo.itemsTable.headers[0], text: item.key.toString() },
+        { header: docInfo.itemsTable.headers[1], text: item.description, leftAlign: true },
+        { header: docInfo.itemsTable.headers[2], text: item.unit },
+        { header: docInfo.itemsTable.headers[3], text: item.amount.toString() },
+        { header: docInfo.itemsTable.headers[4], text: toMoneyFormat(item.netPrice) },
+        { header: docInfo.itemsTable.headers[5], text: toMoneyFormat(item.netValue) },
+        { header: docInfo.itemsTable.headers[6], text: toPercentage(item.vatRate) },
+        { header: docInfo.itemsTable.headers[7], text: toMoneyFormat(item.vatValue) },
+        { header: docInfo.itemsTable.headers[8], text: toMoneyFormat(item.grossValue) },
     ].map((x) =>
         new InvoiceItemData(doc, {
             header: x.header,
@@ -109,16 +120,17 @@ function generateItem(
         })
     )
 
-    const maxHeight = Math.max(...items.map((x) => x.textDimensions.totalHeight))
+    const maxHeight = Math.max(...items.map((x) => x.textDimensions.height)) + 2
 
     //populate text
+    setFont(doc, docInfo.itemsTable.dataFont)
     items.forEach((item) => {
         const textX = item.textAlign === 'center'
             ? item.boundries.left + (item.maxWidth / 2)
             : item.boundries.left + item.maxWidth * 0.03
 
         const textY = previousItemRect.y + previousItemRect.height + 1 +
-            (maxHeight - item.textDimensions.totalHeight) / 2
+            (maxHeight - item.textDimensions.height) / 2
 
         doc.text(item.splitText, textX, textY, {
             align: item.textAlign,
@@ -128,7 +140,7 @@ function generateItem(
     })
 
     //draw rectangles
-    doc.setDrawColor(0, 0, 0)
+    setDrawing(doc, docInfo.itemsTable.drawing)
     items.forEach((item) => {
         const startX = item.boundries.left
         const startY = previousItemRect.y + previousItemRect.height
@@ -143,28 +155,9 @@ function generateItem(
     }
 }
 
-function genearateTableAggregate(
-    doc: jsPDF,
-    invoiceItems: InvoiceItem[],
-    tableHeaders: TableHeader[],
-    lastRowRect: ElementBoundingBox,
-): ElementBoundingBox {
-    const headers = tableHeaders.slice(4)
-}
-function toMoneyFormat(n: number) {
-    return new Intl
-        .NumberFormat('pl-PL', { minimumFractionDigits: 2, useGrouping: true })
-        .format(n)
-}
-
-function toPercentage(n: number) {
-    return new Intl
-        .NumberFormat('pl-PL', { maximumFractionDigits: 0, useGrouping: true, style: 'percent' })
-        .format(n)
-}
 class InvoiceItemData {
     private _splitText: string[]
-    private _textDimensions: TextDimensions
+    private _textDimensions: TextSize
     private _boundries: { left: number; right: number }
     private _textAlign: 'left' | 'center'
 
@@ -198,8 +191,143 @@ class InvoiceItemData {
         },
     ) {
         this._splitText = doc.splitTextToSize(data.text, data.header.size)
-        this._textDimensions = getTextDimensions(doc, this._splitText)
+        this._textDimensions = getTextSize(doc, this._splitText)
         this._boundries = data.boundries
         this._textAlign = data.textAlign
     }
+}
+
+function generateAggregate(
+    doc: jsPDF,
+    docInfo: InvoiceDocData,
+    itemsBoundingBox: ElementBoundingBox,
+    invoiceAggregate: InvoiceAggregate,
+) {
+    //generate including row
+    const netPriceLeftBorder = docInfo.itemsTable.headers
+        .slice(0, 4)
+        .reduce((acc, cur) => acc + cur.size, itemsBoundingBox.x)
+    const includingRowStartY = itemsBoundingBox.y + itemsBoundingBox.height
+    const includingRowBoundingBox = generateAggregateRow(
+        doc,
+        docInfo,
+        netPriceLeftBorder,
+        includingRowStartY,
+        invoiceAggregate,
+        (docInfo) => docInfo.itemsTable.aggregate.includingTitle,
+        (vatRate) => toPercentage(vatRate),
+        docInfo => docInfo.itemsTable.aggregate.includingFont
+    )
+
+    //generate total row
+    const totalRowBoundingBox = generateAggregateRow(
+        doc,
+        docInfo,
+        netPriceLeftBorder,
+        includingRowBoundingBox.y + includingRowBoundingBox.height,
+        invoiceAggregate,
+        (docInfo) => docInfo.itemsTable.aggregate.totalTitle,
+        () => '',
+        docInfo => docInfo.itemsTable.aggregate.totalFont
+    )
+    return {}
+}
+
+function generateAggregateRow(
+    doc: jsPDF,
+    docInfo: InvoiceDocData,
+    startX: number,
+    startY: number,
+    invoiceAggregate: InvoiceAggregate,
+    getTitle: (docInfo: InvoiceDocData) => string,
+    formatVatRate: (v: number) => string,
+    getFont: (docInfo: InvoiceDocData) => Font,
+
+) {
+    //populate text
+    const includingText = getTitle(docInfo)
+    const netPriceHeader = docInfo.itemsTable.headers[4]
+    const textSize = getTextSize(doc, includingText)
+    const rowHeight = textSize.height + 2
+
+    const textX = startX + netPriceHeader.size / 2
+    const textY = startY + rowHeight / 2
+    setFont(doc, getFont(docInfo))
+    doc.text(includingText, textX, textY, {
+        align: 'center',
+        baseline: 'middle',
+    })
+
+    //prepare elements
+    const elementsToDraw = []
+    let leftBorder = startX + docInfo.itemsTable.headers[4].size
+    for (let headerIndex = 5; headerIndex < docInfo.itemsTable.headers.length; headerIndex++) {
+        let text = ''
+        switch (headerIndex) {
+            case 5:
+                text = toMoneyFormat(invoiceAggregate.netValue)
+                break
+            case 6:
+                text = formatVatRate(invoiceAggregate.vatRate)
+                break
+            case 7:
+                text = toMoneyFormat(invoiceAggregate.vatValue)
+                break
+            case 8:
+                text = toMoneyFormat(invoiceAggregate.grossValue)
+                break
+        }
+
+        const element = {
+            leftBorder: leftBorder,
+            rightBorder: leftBorder + docInfo.itemsTable.headers[headerIndex].size,
+            text: text,
+            textSize: getTextSize(doc, text),
+        }
+
+        leftBorder = element.rightBorder
+
+        elementsToDraw.push(element)
+    }
+
+    //draw elements
+    setFont(doc, docInfo.itemsTable.dataFont)
+    elementsToDraw.forEach((element) => {
+        const width = element.rightBorder - element.leftBorder
+        doc.rect(element.leftBorder, startY, width, rowHeight, 'S')
+        const textX = element.leftBorder + width / 2
+        const textY = startY + rowHeight / 2
+        doc.text(element.text, textX, textY, {
+            align: 'center',
+            baseline: 'middle',
+        })
+    })
+
+    const totalWidth = startX + docInfo.itemsTable.headers.slice(4).reduce((acc, cur) => acc + cur.size, 0)
+    return {
+        x: startX,
+        y: startY,
+        width: totalWidth,
+        height: rowHeight,
+    }
+}
+
+function generateTotalRow(
+    doc: jsPDF,
+    docInfo: InvoiceDocData,
+    includingRowBoundingBox: ElementBoundingBox,
+    invoiceItems: InvoiceItem[],
+) {
+}
+
+function toMoneyFormat(n: number) {
+    return new Intl
+        .NumberFormat('pl-PL', { minimumFractionDigits: 2, useGrouping: true })
+        .format(n)
+}
+
+function toPercentage(n: number) {
+    return new Intl
+        .NumberFormat('pl-PL', { maximumFractionDigits: 0, useGrouping: true, style: 'percent' })
+        .format(n)
 }

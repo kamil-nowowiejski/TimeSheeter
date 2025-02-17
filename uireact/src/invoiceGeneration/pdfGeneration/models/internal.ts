@@ -1,8 +1,12 @@
 import {
+Drawing,
+    Font,
+    InvoiceItemsTableAggregate,
     InvoiceTemplate,
-    InvoiceUpperDetailsTemplate,
+    InvoiceTitleTemplate,
+    InvoiceTopDetailsTemplate,
     Margins,
-    TableHeader as TableTemplateHeader,
+    InvoiceItemsTableHeader as TableTemplateHeader,
 } from './templateDefintion.ts'
 
 export interface ElementBoundingBox {
@@ -15,8 +19,9 @@ export interface ElementBoundingBox {
 export class InvoiceDocData {
     private _pageWidth: number
     private _margins: Margins
-    private _upperDetails: InvoiceUpperDetailsTemplate
-    private _tableHeaders: TableHeader[]
+    private _invoiceTopDetails: InvoiceTopDetailsTemplate
+    private _invoiceTitle: InvoiceTitleTemplate
+    private _invoiceItemsTable: InvoiceItemsTableTemplate
 
     public get pageWidth() {
         return this._pageWidth
@@ -26,12 +31,16 @@ export class InvoiceDocData {
         return this._margins
     }
 
-    public get upperDetails() {
-        return this._upperDetails
+    public get topDetails() {
+        return this._invoiceTopDetails
     }
 
-    public get tableHeaders() {
-        return this._tableHeaders
+    public get title() {
+        return this._invoiceTitle
+    }
+
+    public get itemsTable() {
+        return this._invoiceItemsTable
     }
 
     constructor(data: {
@@ -40,8 +49,15 @@ export class InvoiceDocData {
     }) {
         this._pageWidth = data.pageWidth
         this._margins = data.invoiceTemplate.margins
-        this._upperDetails = data.invoiceTemplate.upperDetails
-        this._tableHeaders = this.calculateTableHeadersSize(data.invoiceTemplate.tableHeaders)
+        this._invoiceTopDetails = data.invoiceTemplate.upperDetails
+        this._invoiceTitle = data.invoiceTemplate.invoiceTitle
+        this._invoiceItemsTable = {
+            headers: this.calculateTableHeadersSize(data.invoiceTemplate.itemsTable.headers),
+            headersFont: data.invoiceTemplate.itemsTable.headersFont,
+            dataFont: data.invoiceTemplate.itemsTable.dataFont,
+            drawing: data.invoiceTemplate.itemsTable.drawing,
+            aggregate: data.invoiceTemplate.itemsTable.aggregate
+        }
     }
 
     private calculateTableHeadersSize(tableHeaders: TableTemplateHeader[]): TableHeader[] {
@@ -53,6 +69,14 @@ export class InvoiceDocData {
             }
         })
     }
+}
+
+export interface InvoiceItemsTableTemplate {
+    headers: TableHeader[]
+    headersFont: Font
+    dataFont: Font
+    drawing: Drawing
+    aggregate: InvoiceItemsTableAggregate
 }
 
 export interface TableHeader {

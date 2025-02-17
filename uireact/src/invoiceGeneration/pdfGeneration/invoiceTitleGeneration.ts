@@ -1,7 +1,8 @@
 import { jsPDF } from 'jspdf'
-import { getTextDimensions } from './utils.ts'
+import { getTextSize } from './utils.ts'
 import { ElementBoundingBox, InvoiceDocData } from './models/internal.ts'
 import { Invoice } from './models/input.ts'
+import { setFont } from './models/extensions.ts'
 
 export function generateInvoiceTitle(
     doc: jsPDF,
@@ -9,19 +10,20 @@ export function generateInvoiceTitle(
     invoice: Invoice,
     upperDetailsRect: ElementBoundingBox,
 ): ElementBoundingBox {
-    const verticalSeparator = 2.5
+    setFont(doc, docInfo.title.font)
     const titleMessage = invoice.title
-    const textDim = getTextDimensions(doc, titleMessage)
-    const textX = (docInfo.pageWidth - 2 * docInfo.margins.horizontal - textDim.totalWidth) / 2
-    const textY = upperDetailsRect.y + upperDetailsRect.height + textDim.firstLineHeight + verticalSeparator
-    doc.setDrawColor(255, 0, 0)
-    doc.line(0, upperDetailsRect.y + upperDetailsRect.height, 10000, upperDetailsRect.y + upperDetailsRect.height)
+    const textSize = getTextSize(doc, titleMessage)
+    const textX = docInfo.pageWidth / 2
+    const textY = upperDetailsRect.y + upperDetailsRect.height + docInfo.title.topMargin
 
-    doc.text(titleMessage, textX, textY)
+    doc.text(titleMessage, textX, textY, {
+        align: 'center',
+        baseline: 'top',
+    })
     return {
         x: textX,
         y: textY,
-        width: textDim.totalWidth,
-        height: textDim.totalHeight,
+        width: textSize.width,
+        height: textSize.height + docInfo.title.bottomMargin,
     }
 }

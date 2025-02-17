@@ -5,6 +5,7 @@ export interface Invoice {
     issuer: Company
     buyer: Company
     items: InvoiceItem[]
+    aggregate: InvoiceAggregate,
     methodOfPayment: string
     paymentDeadline: string
     bankAccount: string
@@ -19,6 +20,13 @@ export interface InvoiceItem {
     unit: string
     amount: number
     netPrice: number
+    netValue: number
+    vatRate: number
+    vatValue: number
+    grossValue: number
+}
+
+export interface InvoiceAggregate{
     netValue: number
     vatRate: number
     vatValue: number

@@ -1,6 +1,6 @@
 import { jsPDF } from 'jspdf'
 import { InvoiceTemplate } from './models/templateDefintion.ts'
-import { generateUpperDetails } from './upperDetailsGeneration.ts'
+import { generateTopDetails } from './topDetailsGeneration.ts'
 import { generateInvoiceTitle } from './invoiceTitleGeneration.ts'
 import { generateItemsTable } from './invoiceTableGeneration.ts'
 import { Invoice } from './models/input.ts'
@@ -9,7 +9,8 @@ import { InvoiceDocData } from './models/internal.ts'
 export type { Invoice } from './models/input.ts'
 
 export interface FontsProvider {
-    getArialUnicodeMs: () => Promise<string>
+    getFontRegular: () => Promise<string>
+    getFontBold: () => Promise<string>
 }
 
 export async function generateInvoice(invoice: Invoice, fileName: string, fonts: FontsProvider) {
@@ -17,24 +18,29 @@ export async function generateInvoice(invoice: Invoice, fileName: string, fonts:
     await setupFonts(doc, fonts)
 
     const invoiceDocData = new InvoiceDocData({
-        pageWidth:doc.internal.pageSize.getWidth(),
-        invoiceTemplate: new InvoiceTemplate()
+        pageWidth: doc.internal.pageSize.getWidth(),
+        invoiceTemplate: new InvoiceTemplate(),
     })
 
-    const upperDetailsRect = generateUpperDetails(doc, invoiceDocData, invoice)
+    const upperDetailsRect = generateTopDetails(doc, invoiceDocData, invoice)
     const invoiceTitleRect = generateInvoiceTitle(doc, invoiceDocData, invoice, upperDetailsRect)
-    generateItemsTable(doc, invoiceDocData, invoice.items, invoiceTitleRect)
+    generateItemsTable(doc, invoiceDocData, invoice, invoiceTitleRect)
 
     doc.save(fileName)
 }
 
 async function setupFonts(doc: jsPDF, fonts: FontsProvider) {
-    await fonts.getArialUnicodeMs()
-        .then((content) => setupFont('arial-unicode-ms', content))
-    doc.setFont('arial-unicode-ms')
-    function setupFont(name: string, content: string) {
-        const fileName = name + '.ttf'
+    await fonts.getFontRegular()
+        .then((content) => setupFont('arial', content, 'regular'))
+
+    await fonts.getFontBold()
+        .then((content) => setupFont('arial', content, 'bold'))
+
+    doc.setFont('arial', 'regular')
+    
+    function setupFont(name: string, content: string, style: string) {
+        const fileName = name + style + '.ttf'
         doc.addFileToVFS(fileName, content)
-        doc.addFont(fileName, name, 'normal')
+        doc.addFont(fileName, name, style)
     }
 }

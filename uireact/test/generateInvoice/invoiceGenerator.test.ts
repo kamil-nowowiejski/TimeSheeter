@@ -18,8 +18,16 @@ function removeExistingTestInvoiceFile(fileName: string) {
 }
 
 class TestFontsProvider implements FontsProvider {
-    async getArialUnicodeMs() {
-        const content = await Deno.readFile('./public/arial-unicode-ms.ttf')
+    getFontRegular() {
+        return this.getFont('arial.ttf')
+    }
+
+    getFontBold() {
+        return this.getFont('arialbd.ttf')
+    }
+
+    async getFont(fileName: string) {
+        const content = await Deno.readFile(`./public/${fileName}`)
         return this.arrayBufferToBase64(content)
     }
 
@@ -34,7 +42,6 @@ class TestFontsProvider implements FontsProvider {
 }
 
 function getTestInvoice(): Invoice {
-
     const exampleItem = {
         key: 1,
         description: 'Umowa nr 1/2026 na swiadczenie uslugi od dnia 22.22.2222 do dnia 22.22.2222',
@@ -65,6 +72,12 @@ function getTestInvoice(): Invoice {
             address2: '54-535 Warszawa',
         },
         items: items,
+        aggregate: {
+            netValue: 23520,
+            vatRate: 0.23,
+            vatValue: 5402.6,
+            grossValue: 28929.6,
+        },
         methodOfPayment: 'przelew',
         paymentDeadline: '30-03-4443',
         bankAccount: '00 0000 0000 0000 0000 0000 0000',
