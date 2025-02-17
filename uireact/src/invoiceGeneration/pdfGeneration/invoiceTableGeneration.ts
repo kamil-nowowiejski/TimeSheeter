@@ -10,10 +10,16 @@ export function generateItemsTable(
     docInfo: InvoiceDocData,
     invoice: Invoice,
     invoiceTitleBoundingBox: ElementBoundingBox,
-) {
+) : ElementBoundingBox{
     const headersBoundingBox = generateItemsTableHeaders(doc, docInfo, invoiceTitleBoundingBox)
     const itemsBoundingBox = generateItems(doc, docInfo, headersBoundingBox, invoice.items)
     const aggregateBoundingBox = generateAggregate(doc, docInfo, itemsBoundingBox, invoice.aggregate)
+    return {
+        x: headersBoundingBox.x,
+        y: headersBoundingBox.y,
+        width: headersBoundingBox.width,
+        height: headersBoundingBox.height + itemsBoundingBox.height + aggregateBoundingBox.height
+    }
 }
 
 function generateItemsTableHeaders(
@@ -202,7 +208,7 @@ function generateAggregate(
     docInfo: InvoiceDocData,
     itemsBoundingBox: ElementBoundingBox,
     invoiceAggregate: InvoiceAggregate,
-) {
+) : ElementBoundingBox{
     //generate including row
     const netPriceLeftBorder = docInfo.itemsTable.headers
         .slice(0, 4)
@@ -230,7 +236,12 @@ function generateAggregate(
         () => '',
         docInfo => docInfo.itemsTable.aggregate.totalFont
     )
-    return {}
+    return {
+        x: netPriceLeftBorder, 
+        y: includingRowStartY, 
+        width: includingRowBoundingBox.width,
+        height: includingRowBoundingBox.height + totalRowBoundingBox.height
+    }
 }
 
 function generateAggregateRow(
@@ -243,7 +254,7 @@ function generateAggregateRow(
     formatVatRate: (v: number) => string,
     getFont: (docInfo: InvoiceDocData) => Font,
 
-) {
+) : ElementBoundingBox {
     //populate text
     const includingText = getTitle(docInfo)
     const netPriceHeader = docInfo.itemsTable.headers[4]

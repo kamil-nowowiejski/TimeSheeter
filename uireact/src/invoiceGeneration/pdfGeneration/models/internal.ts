@@ -1,6 +1,7 @@
 import {
 Drawing,
     Font,
+    InvoiceBottomDetailsTemplate,
     InvoiceItemsTableAggregate,
     InvoiceTemplate,
     InvoiceTitleTemplate,
@@ -22,6 +23,7 @@ export class InvoiceDocData {
     private _invoiceTopDetails: InvoiceTopDetailsTemplate
     private _invoiceTitle: InvoiceTitleTemplate
     private _invoiceItemsTable: InvoiceItemsTableTemplate
+    private _bottomDetails: InvoiceBottomDetailsTemplate
 
     public get pageWidth() {
         return this._pageWidth
@@ -43,13 +45,17 @@ export class InvoiceDocData {
         return this._invoiceItemsTable
     }
 
+    public get bottomDetails(){
+        return this._bottomDetails
+    }
+
     constructor(data: {
         pageWidth: number
         invoiceTemplate: InvoiceTemplate
     }) {
         this._pageWidth = data.pageWidth
         this._margins = data.invoiceTemplate.margins
-        this._invoiceTopDetails = data.invoiceTemplate.upperDetails
+        this._invoiceTopDetails = data.invoiceTemplate.topDetails
         this._invoiceTitle = data.invoiceTemplate.invoiceTitle
         this._invoiceItemsTable = {
             headers: this.calculateTableHeadersSize(data.invoiceTemplate.itemsTable.headers),
@@ -58,6 +64,7 @@ export class InvoiceDocData {
             drawing: data.invoiceTemplate.itemsTable.drawing,
             aggregate: data.invoiceTemplate.itemsTable.aggregate
         }
+        this._bottomDetails  = data.invoiceTemplate.bottomDetails
     }
 
     private calculateTableHeadersSize(tableHeaders: TableTemplateHeader[]): TableHeader[] {

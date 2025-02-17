@@ -3,11 +3,12 @@ export class InvoiceTemplate {
     private _topDetails: InvoiceTopDetailsTemplate
     private _invoiceTitle: InvoiceTitleTemplate
     private _invoiceItemsTable: InvoiceItemsTableTemplate
+    private _bottomDetails: InvoiceBottomDetailsTemplate
 
     public get margins() {
         return this._margins
     }
-    public get upperDetails() {
+    public get topDetails() {
         return this._topDetails
     }
 
@@ -17,6 +18,10 @@ export class InvoiceTemplate {
 
     public get itemsTable() {
         return this._invoiceItemsTable
+    }
+
+    public get bottomDetails() {
+        return this._bottomDetails
     }
 
     constructor() {
@@ -103,6 +108,48 @@ export class InvoiceTemplate {
             },
         }
 
+        this._bottomDetails = {
+            left: {
+                paymentMethodTitle: 'Sposób płatności',
+                paymentDeadlineTitle: 'Termin płatności',
+                bankAccountNumberTitle: 'Numer konta',
+                bankNameTitle: 'Nazwa banku',
+                extraInfoTitle: 'Dodatkowe informacje',
+                titleFont: {
+                    name: 'arial',
+                    size: 12,
+                    style: 'bold',
+                },
+                dataFont: {
+                    name: 'arial',
+                    size: 12,
+                    style: 'regular',
+                },
+            },
+            right: {
+                totalPaymentTitle: 'Do zapłaty',
+                totalPaymentFont: {
+                    name: 'arial',
+                    size: 12,
+                    style: 'bold',
+                },
+
+                inWordsTotalPaymentTitle: 'Słownie',
+                inWordsTotalPaymentFont: {
+                    name: 'arial',
+                    size: 12,
+                    style: 'regular',
+                },
+            },
+            topMargin: 7,
+            verticalSpace: 10,
+            drawing: {
+                fillColor: { r: 230, g: 230, b: 230 },
+                lineColor: { r: 100, g: 100, b: 100 },
+                lineWidth: 0.3,
+            }
+        }
+
         this.validateDefinedData()
     }
 
@@ -161,6 +208,31 @@ export interface InvoiceItemsTableAggregate {
     includingFont: Font
     totalTitle: string
     totalFont: Font
+}
+
+export interface InvoiceBottomDetailsTemplate {
+    left: InvoiceBottomLeftDetailsTemplate
+    right: InvoiceBottomRightDetailsTemplate
+    topMargin: number
+    verticalSpace: number
+    drawing: Drawing
+}
+
+export interface InvoiceBottomLeftDetailsTemplate {
+    paymentMethodTitle: string
+    paymentDeadlineTitle: string
+    bankAccountNumberTitle: string
+    bankNameTitle: string
+    extraInfoTitle: string
+    titleFont: Font
+    dataFont: Font
+}
+
+export interface InvoiceBottomRightDetailsTemplate {
+    totalPaymentTitle: string
+    totalPaymentFont: Font
+    inWordsTotalPaymentTitle: string
+    inWordsTotalPaymentFont: Font
 }
 
 export interface Font {

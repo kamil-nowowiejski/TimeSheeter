@@ -5,6 +5,7 @@ import { generateInvoiceTitle } from './invoiceTitleGeneration.ts'
 import { generateItemsTable } from './invoiceTableGeneration.ts'
 import { Invoice } from './models/input.ts'
 import { InvoiceDocData } from './models/internal.ts'
+import { generateBottomDetails } from './bottomDetailsGeneration.ts'
 
 export type { Invoice } from './models/input.ts'
 
@@ -17,14 +18,15 @@ export async function generateInvoice(invoice: Invoice, fileName: string, fonts:
     const doc = new jsPDF()
     await setupFonts(doc, fonts)
 
-    const invoiceDocData = new InvoiceDocData({
+    const docInfo = new InvoiceDocData({
         pageWidth: doc.internal.pageSize.getWidth(),
         invoiceTemplate: new InvoiceTemplate(),
     })
 
-    const upperDetailsRect = generateTopDetails(doc, invoiceDocData, invoice)
-    const invoiceTitleRect = generateInvoiceTitle(doc, invoiceDocData, invoice, upperDetailsRect)
-    generateItemsTable(doc, invoiceDocData, invoice, invoiceTitleRect)
+    const upperDetailsBoundingBox = generateTopDetails(doc, docInfo, invoice)
+    const invoiceTitleBoundingBox = generateInvoiceTitle(doc, docInfo, invoice, upperDetailsBoundingBox)
+    const itemsTableBoundingBox = generateItemsTable(doc, docInfo, invoice, invoiceTitleBoundingBox)
+    generateBottomDetails(doc, docInfo, invoice, itemsTableBoundingBox)
 
     doc.save(fileName)
 }
