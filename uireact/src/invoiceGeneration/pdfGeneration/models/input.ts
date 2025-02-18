@@ -31,6 +31,7 @@ export interface InvoiceAggregate{
     vatRate: number
     vatValue: number
     grossValue: number
+    grossValueInWords: string
 }
 
 export interface Company{

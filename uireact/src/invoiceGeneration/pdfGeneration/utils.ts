@@ -17,3 +17,15 @@ export function getTextSize(doc: jsPDF, text: string[] | string): TextSize {
     }
 }
 
+export function toMoneyFormat(n: number, currency?: string) {
+    const formatted = new Intl
+        .NumberFormat('pl-PL', { minimumFractionDigits: 2, useGrouping: true })
+        .format(n)
+    return currency !== undefined ? `${formatted} ${currency}` : formatted
+}
+
+export function toPercentage(n: number) {
+    return new Intl
+        .NumberFormat('pl-PL', { maximumFractionDigits: 0, useGrouping: true, style: 'percent' })
+        .format(n)
+}

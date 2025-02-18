@@ -1,7 +1,7 @@
 import { jsPDF } from 'jspdf'
 import { ElementBoundingBox, InvoiceDocData, TableHeader } from './models/internal.ts'
 import { Invoice, InvoiceAggregate, InvoiceItem } from './models/input.ts'
-import { getTextSize, TextSize } from './utils.ts'
+import { getTextSize, TextSize, toMoneyFormat, toPercentage } from './utils.ts'
 import { setDrawing, setFont } from './models/extensions.ts'
 import { Font } from './models/templateDefintion.ts'
 
@@ -321,24 +321,4 @@ function generateAggregateRow(
         width: totalWidth,
         height: rowHeight,
     }
-}
-
-function generateTotalRow(
-    doc: jsPDF,
-    docInfo: InvoiceDocData,
-    includingRowBoundingBox: ElementBoundingBox,
-    invoiceItems: InvoiceItem[],
-) {
-}
-
-function toMoneyFormat(n: number) {
-    return new Intl
-        .NumberFormat('pl-PL', { minimumFractionDigits: 2, useGrouping: true })
-        .format(n)
-}
-
-function toPercentage(n: number) {
-    return new Intl
-        .NumberFormat('pl-PL', { maximumFractionDigits: 0, useGrouping: true, style: 'percent' })
-        .format(n)
 }

@@ -77,6 +77,7 @@ function getTestInvoice(): Invoice {
             vatRate: 0.23,
             vatValue: 5402.6,
             grossValue: 28929.6,
+            grossValueInWords: 'dwadzieścia osiem tysięcy dziewięćset dwadzieścia dziewięć 60/100 PLN',
         },
         methodOfPayment: 'przelew',
         paymentDeadline: '30-03-4443',
