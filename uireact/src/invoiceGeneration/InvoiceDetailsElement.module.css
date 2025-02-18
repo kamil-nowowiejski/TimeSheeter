@@ -1,0 +1,9 @@
+.companiesContainer{
+    display: flex;
+    flex-direction: row;
+    margin-top: 20px;
+}
+
+.separator{
+    margin-right: 70px;
+}

@@ -9,7 +9,7 @@ import EmptyDayElement from './EmptyDayElement.tsx'
 
 
 export default function TimeSheetHistoryElement() {
-    const [month, setMonth] = useState<Month>(getCurrentMonth())
+    const [month, setMonth] = useState<Month>(Month.current())
     const [monthHistory, setMonthHistory] = useState<MonthHistory>()
 
     useEffect(() => { fetchHistory(month, setMonthHistory) }, [month])
@@ -33,11 +33,6 @@ export default function TimeSheetHistoryElement() {
             <AggregatedStats />
         </div>
     )
-}
-
-function getCurrentMonth() {
-    const currentDate = new Date();
-    return new Month(currentDate.getMonth() + 1, currentDate.getFullYear())
 }
 
 async function fetchHistory(month: Month, setMonthHistory: (history: MonthHistory) => void) {

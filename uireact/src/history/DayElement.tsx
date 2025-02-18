@@ -1,5 +1,5 @@
 import { CSSProperties } from "react";
-import { WorkDay } from "../common/models"
+import { WorkDay } from "../common/models.ts"
 import styles from './DayElement.module.css'
 
 interface DayElementProps {

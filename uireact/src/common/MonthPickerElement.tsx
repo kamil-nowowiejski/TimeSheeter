@@ -1,11 +1,11 @@
-import { useState, useEffect } from 'react'
-import { Month } from './models';
+import { useState,  } from 'react'
+import { Month } from './models.ts';
 import styles from './MonthPickerElement.module.css'
 
 export interface MonthPickerProps {
     defaultValue: Month | undefined;
     onInput: (month: Month) => void;
-    className: string | undefined;
+    className?: string | undefined;
 }
 
 export default function MonthPicker(props: MonthPickerProps) {

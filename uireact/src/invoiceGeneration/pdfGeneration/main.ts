@@ -7,7 +7,7 @@ import { Invoice } from './models/input.ts'
 import { InvoiceDocData } from './models/internal.ts'
 import { generateBottomDetails } from './bottomDetailsGeneration.ts'
 
-export type { Invoice } from './models/input.ts'
+export type { Invoice, Company, InvoiceItem, InvoiceAggregate } from './models/input.ts'
 
 export interface FontsProvider {
     getFontRegular: () => Promise<string>

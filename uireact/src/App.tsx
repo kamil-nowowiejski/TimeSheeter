@@ -3,8 +3,7 @@ import styles from './App.module.css'
 import CurrentWeek from './currentWeek/CurrentWeekElement.tsx'
 import { SideMenu } from './sideMenu/SideMenu.tsx'
 import TimeSheetHistory from './history/TimeSheetHistoryElement.tsx'
-import React from 'react';
-
+import InvoiceGeneration from './invoiceGeneration/InvoiceGenerationElement.tsx'
 enum tabs {
     currentWeek,
     timeSheetHistory,
@@ -13,7 +12,7 @@ enum tabs {
 
 
 export default function App() {
-    const [selectedTab, setSelectedTab] = useState(tabs.timeSheetHistory)
+    const [selectedTab, setSelectedTab] = useState(tabs.invoiceGenerator)
 
     return (
         <div className={styles.flexRow}>
@@ -32,6 +31,7 @@ function getCurrentTab(selectedTab: tabs) {
     switch (selectedTab) {
         case tabs.currentWeek: return <CurrentWeek />
         case tabs.timeSheetHistory: return <TimeSheetHistory />
+        case tabs.invoiceGenerator: return <InvoiceGeneration/>
         default: break;
     }
 }
