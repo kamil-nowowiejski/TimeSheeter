@@ -117,12 +117,12 @@ export class InvoiceTemplate {
                 extraInfoTitle: 'Dodatkowe informacje',
                 titleFont: {
                     name: 'arial',
-                    size: 12,
+                    size: 10,
                     style: 'bold',
                 },
                 dataFont: {
                     name: 'arial',
-                    size: 12,
+                    size: 10,
                     style: 'regular',
                 },
             },
@@ -130,23 +130,23 @@ export class InvoiceTemplate {
                 totalPaymentTitle: 'Do zapłaty',
                 totalPaymentFont: {
                     name: 'arial',
-                    size: 12,
+                    size: 14,
                     style: 'bold',
                 },
 
                 inWordsTotalPaymentTitle: 'Słownie',
                 inWordsTotalPaymentFont: {
                     name: 'arial',
-                    size: 12,
+                    size: 10,
                     style: 'regular',
                 },
             },
-            topMargin: 7,
-            verticalSpace: 10,
+            topMargin: 14,
+            verticalSpace: 20,
             drawing: {
-                fillColor: { r: 230, g: 230, b: 230 },
-                lineColor: { r: 100, g: 100, b: 100 },
-                lineWidth: 0.3,
+                fillColor: { r: 0, g: 0, b: 0 },
+                lineColor: { r: 0, g: 0, b: 0 },
+                lineWidth: 0.2,
             }
         }
 
