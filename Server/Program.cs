@@ -23,10 +23,11 @@ public class Program
         {
             options.Server.Host = "localhost";
             options.Server.Port = 5174;
-            options.Server.AutoRun = true;
+            options.Server.AutoRun = false;
             options.Server.Https = false;
             options.Server.PackageDirectory = "../uireact";
             options.Server.UseReactRefresh = true;
+            options.Server.PackageManager = "deno";
             options.Base = "assets";
         });
 

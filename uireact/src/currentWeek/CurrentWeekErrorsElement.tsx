@@ -9,12 +9,14 @@ export default function CurrentWeekErrorsElement(props: CurrentWeekErrorsElement
     if (props.workDays === undefined)
         return
 
+    const errorMessages = props.workDays.map(getErrorMessage).filter(x => x !== undefined)
+    if(errorMessages.length === 0)
+        return
+
     return (
         <div className={styles.errors}>
             <label className={styles.errorLabelTitle}>Correct the following errors:</label>
-            {props.workDays
-                .map(getErrorMessage)
-                .filter(x => x !== undefined)
+            {errorMessages
                 .map(x => (
                     <label className={styles.errorLabel} key={x.key}>{x.error}</label>
                 ))}

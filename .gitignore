@@ -135,3 +135,4 @@ _NCrunch*
 
 node_modules
 dist
+uireact/.vite
