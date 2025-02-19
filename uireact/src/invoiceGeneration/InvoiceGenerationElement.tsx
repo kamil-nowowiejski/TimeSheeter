@@ -13,6 +13,7 @@ import {
 } from './pdfGeneration/main.ts'
 import { InvoiceAggregate } from './pdfGeneration/models/input.ts'
 import { FormNames } from './formNames.ts'
+import InvoiceItemsElement from './InvoiceItemsElement.tsx'
 
 export default function InvoiceGenerationElement() {
     const [month, setMonth] = useState<Month>(Month.current())
@@ -44,6 +45,8 @@ export default function InvoiceGenerationElement() {
                 issuer={initialData.issuer}
                 buyer={initialData.buyer}
             />
+
+            <InvoiceItemsElement invoiceItems={initialData.invoiceItems}/>
 
             <button type='submit'>Generate Invoice</button>
         </form>
@@ -126,6 +129,7 @@ function generateInvoice(data: FormData) {
 interface InitialData {
     issuer: Company
     buyer: Company
+    invoiceItems: InvoiceItem[]
 }
 
 class FontsProvider implements IFontsProvider {
@@ -185,5 +189,8 @@ function createEmptyData(): InitialData {
                 formItemName: FormNames.BuyerCity,
             },
         },
+        invoiceItems:[
+           new InvoiceItem('umow nr xd na swiadczenie uslug od dnia xx/xx/xx do dno xx/xx/xx', 'h', 168, 23520, 0.23) 
+        ]
     }
 }

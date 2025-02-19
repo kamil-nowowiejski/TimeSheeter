@@ -1,4 +1,4 @@
-export  interface Company{
+export interface Company {
     name: FormItem
     nip: FormItem
     street: FormItem
@@ -6,11 +6,10 @@ export  interface Company{
     city: FormItem
 }
 
-export interface FormItem{
+export interface FormItem {
     defaultValue: string
     formItemName: string
 }
-
 
 export class InvoiceItem {
     private _description: string
@@ -22,6 +21,7 @@ export class InvoiceItem {
     public get description() {
         return this._description
     }
+
     public get unit() {
         return this._unit
     }
@@ -49,4 +49,31 @@ export class InvoiceItem {
         this._netPrice = netPrice
         this._vatRate = vatRate
     }
+    public update(item: ShallowInvoiceItem) {
+        return new InvoiceItem(
+            item.description,
+            item.unit, 
+            item.amount,
+            item.netPrice,
+            item.vatRate
+        )
+    }
+
+    public toShallow(){
+        return {
+            description: this.description,
+            unit: this.unit,
+            amount: this.amount,
+            netPrice: this.netPrice,
+            vatRate: this.vatRate
+        }
+    }
+}
+ 
+interface ShallowInvoiceItem{
+        description: string
+        unit: string
+        amount: number
+        netPrice: number
+        vatRate: number
 }
