@@ -1,5 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using Server.Api;
 using Server.Database;
 using Vite.AspNetCore;
 
@@ -31,8 +30,6 @@ public class Program
             options.Base = "assets";
         });
 
-        AddApplicationServices(builder.Services);
-
         var app = builder.Build();
 
         MigrateDatabase(app.Services);
@@ -55,11 +52,5 @@ public class Program
         using var scope = services.CreateScope();
         var dbContext = scope.ServiceProvider.GetRequiredService<TimeSheeterDbContext>();
         dbContext.Database.Migrate();
-    }
-
-    private static void AddApplicationServices(IServiceCollection services)
-    {
-        services
-            .AddSingleton<ICurrentDateProvider, CurrentDateProvider>();
     }
 }

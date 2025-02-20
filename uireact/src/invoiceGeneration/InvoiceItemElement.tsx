@@ -11,7 +11,7 @@ export default function InvoiceItemElement(props: InvoiceItemElementProps) {
     console.log('render')
     return (
         <tr>
-            <td>{props.index + 1}</td>
+            <td>{props.index}</td>
 
             <td>
                 <input

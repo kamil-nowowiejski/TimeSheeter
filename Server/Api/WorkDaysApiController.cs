@@ -7,16 +7,9 @@ namespace Server.Api;
 
 [ApiController]
 [Route("api/WorkDays")]
-public class WorkDaysApiController : ControllerBase
+public class WorkDaysApiController(TimeSheeterDbContext dbContext) : ControllerBase
 {
-    private TimeSheeterDbContext _dbContext;
-    private readonly ICurrentDateProvider _currentDateProvider;
-
-    public WorkDaysApiController(TimeSheeterDbContext dbContext, ICurrentDateProvider currentDateProvider)
-    {
-        _dbContext = dbContext;
-        _currentDateProvider = currentDateProvider;
-    }
+    private readonly TimeSheeterDbContext _dbContext = dbContext;
 
     [HttpGet]
     public async Task<List<WorkDayDto>> GetWorkDays([FromQuery] DateOnly minDate, [FromQuery] DateOnly maxDate)
@@ -32,12 +25,12 @@ public class WorkDaysApiController : ControllerBase
             })
             .ToListAsync();
 
-        return days.Select(d => new WorkDayDto
+        return [.. days.Select(d => new WorkDayDto
         {
             Date = d.Date,
             StartTime = d.StartTime,
             FinishTime = d.FinishTime
-        }).ToList();
+        })];
 
 
     }
@@ -70,10 +63,3 @@ public class WorkDaysApiController : ControllerBase
         return new OkResult();
     }
 }
-
-public interface ICurrentDateProvider
-{
-    DateOnly GetCurrentDate() => DateOnly.FromDateTime(DateTime.Now);
-}
-
-internal class CurrentDateProvider : ICurrentDateProvider { }

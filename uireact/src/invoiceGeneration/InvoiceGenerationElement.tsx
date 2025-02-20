@@ -1,9 +1,9 @@
-import { Month } from '../common/models.ts'
+import { Earnings, Month } from '../common/models.ts'
 import MonthPicker from '../common/MonthPickerElement.tsx'
 import { useEffect, useRef, useState } from 'react'
 import AmountCalculationModePicker, { AmountCalculationMode } from './ModeSelectorElement.tsx'
 import InvoiceDetails from './InvoiceDetailsElement.tsx'
-import { Company, InvoiceItem } from './models.ts'
+import { Company, InvoiceGeneralInformation, InvoiceItem } from './models.ts'
 import {
     Company as PdfCompany,
     FontsProvider as IFontsProvider,
@@ -14,13 +14,24 @@ import {
 import { InvoiceAggregate } from './pdfGeneration/models/input.ts'
 import { FormNames } from './formNames.ts'
 import InvoiceItemsElement from './InvoiceItemsElement.tsx'
+import GeneralInfoElement from './GeneralInfoElement.tsx'
+import WorkDaysApi from '../apis/workDaysApi.ts'
+import EarningsApi from '../apis/earningsApi.ts'
+import { WorkDay } from '../common/models.ts'
 
 export default function InvoiceGenerationElement() {
     const [month, setMonth] = useState<Month>(Month.current())
     const [mode, setMode] = useState<AmountCalculationMode>(AmountCalculationMode.overridenHours)
     const [initialData, setInitialData] = useState<InitialData>()
 
-    useEffect(() => {
+    useEffect(async () => {
+        const workDaysPromise =  new WorkDaysApi().getWorkDays(month.getDate(1), month.getDate(-1))
+        const earningsPromise = new EarningsApi().get()
+        const values = await Promise.all([ workDaysPromise, earningsPromise ])
+        const workDays = values[0]
+        const earnings = values[1]
+        const invoiceItem = createInvoiceItem(workDays, earnings)
+        createInitialData(workDays)
         setInitialData(createEmptyData())
     }, [])
 
@@ -46,7 +57,8 @@ export default function InvoiceGenerationElement() {
                 buyer={initialData.buyer}
             />
 
-            <InvoiceItemsElement invoiceItems={initialData.invoiceItems}/>
+            <InvoiceItemsElement invoiceItems={initialData.invoiceItems} />
+            <GeneralInfoElement info={initialData.generalInfo} />
 
             <button type='submit'>Generate Invoice</button>
         </form>
@@ -130,16 +142,41 @@ interface InitialData {
     issuer: Company
     buyer: Company
     invoiceItems: InvoiceItem[]
+    generalInfo: InvoiceGeneralInformation
 }
 
 class FontsProvider implements IFontsProvider {
-    getFontRegular(): Promise<string> {
-        return Promise.reject('not implemented')
+    public getFontRegular(): Promise<string> {
+        return this.getFont('arial.ttf')
     }
 
-    getFontBold(): Promise<string> {
-        return Promise.reject('not implemented')
+    public getFontBold(): Promise<string> {
+        return this.getFont('arialbd.ttf')
     }
+
+    private async getFont(fileName: string): Promise<string>{
+
+        const response = await fetch(`fonts/${fileName}`)
+        const bytes =  await response.bytes()
+        return this.arrayBufferToBase64(bytes)
+    }
+
+    private arrayBufferToBase64(bytes: Uint8Array): string {
+        let binary = ''
+        const len = bytes.byteLength
+        for (let i = 0; i < len; i++) {
+            binary += String.fromCharCode(bytes[i])
+        }
+        return globalThis.btoa(binary)
+    }
+}
+
+function createInvoiceItem(workDays:WorkDay[], earnings: Earnings): InitialData {
+
+    //TODO implement modes
+    return new InvoiceItem()
+
+
 }
 function createEmptyData(): InitialData {
     return {
@@ -189,8 +226,22 @@ function createEmptyData(): InitialData {
                 formItemName: FormNames.BuyerCity,
             },
         },
-        invoiceItems:[
-           new InvoiceItem('umow nr xd na swiadczenie uslug od dnia xx/xx/xx do dno xx/xx/xx', 'h', 168, 23520, 0.23) 
-        ]
+        invoiceItems: [
+            new InvoiceItem('umow nr xd na swiadczenie uslug od dnia xx/xx/xx do dno xx/xx/xx', 'h', 168, 23520, 0.23),
+        ],
+        generalInfo: {
+            title: 'dgdgd',
+            placeOfIssue: 'Wroclaw',
+            date: '',
+            paymentMethod: 'przelew',
+            paymentDeadline: '',
+            bankAccount: '00 0000 000 0000 0000 0000',
+            bankName: 'Bank naem',
+            extraInformation: [
+                'item 1',
+                'item 2',
+                'item 3',
+            ],
+        },
     }
 }

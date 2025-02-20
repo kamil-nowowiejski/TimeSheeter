@@ -1,0 +1,41 @@
+using Microsoft.AspNetCore.Mvc;
+using Server.Api.Dtos;
+using Server.Database;
+
+namespace Server.Api;
+
+[ApiController]
+[Route("api/InvoiceTemplate")]
+public class InvoiceTemplateController(TimeSheeterDbContext dbContext) : ControllerBase
+{
+    private readonly TimeSheeterDbContext _dbContext = dbContext;
+
+    [HttpGet]
+    public InvoiceTemplateDto Get()
+    {
+        var invoiceTemplate = _dbContext.InvoiceTemplates.Single();
+        return new InvoiceTemplateDto
+        {
+            Issuer = MapToDto(invoiceTemplate.Issuer),
+            Buyer = MapToDto(invoiceTemplate.Buyer),
+            TitleTemplate = invoiceTemplate.TitleTemplate,
+            BankName = invoiceTemplate.BankName,
+            BankAccount = invoiceTemplate.BankAccount,
+            PlaceOfIssue = invoiceTemplate.PlaceOfIssue,
+            PaymentMethod = invoiceTemplate.PaymentMethod,
+            ExtraInformation = [.. invoiceTemplate.ExtraInformation.Split("\n")]
+        };
+    }
+
+    private static CompanyDto MapToDto(Company company)
+    {
+        return new CompanyDto()
+        {
+            Name = company.Name,
+            Street = company.Street,
+            City = company.City,
+            Nip = company.Nip,
+            PostalCode = company.PostalCode
+        };
+    }
+}

@@ -77,3 +77,15 @@ interface ShallowInvoiceItem{
         netPrice: number
         vatRate: number
 }
+
+export interface InvoiceGeneralInformation{
+    title: string
+    placeOfIssue: string
+    date: string
+    paymentMethod: string
+    paymentDeadline: string
+    bankAccount: string
+    bankName: string
+    extraInformation: string[]
+
+}

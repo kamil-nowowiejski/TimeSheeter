@@ -9,4 +9,3 @@ public class WorkDay
     public TimeSpan? StartTime { get; set; } 
     public TimeSpan? FinishTime { get; set; }
 }
-

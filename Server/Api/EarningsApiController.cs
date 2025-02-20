@@ -1,21 +1,23 @@
-
 using Microsoft.AspNetCore.Mvc;
 using Server.Api.Dtos;
+using Server.Database;
 
 namespace Server.Api;
 
 [ApiController]
 [Route("api/Earnings")]
-public class EarningsApiController : ControllerBase
+public class EarningsApiController(TimeSheeterDbContext dbContext) : ControllerBase
 {
+    private readonly TimeSheeterDbContext _dbContext = dbContext;
+
     [HttpGet]
     public EarningsDto Get()
     {
-        //TODO Add config
+        var earnings = _dbContext.Earnings.Single();
         return new EarningsDto
         {
-            EarningsPerHour = 140,
-            Currency = "PLN"
+            EarningsPerHour = earnings.EarningsPerHour,
+            Currency = earnings.Currency
         };
     }
 

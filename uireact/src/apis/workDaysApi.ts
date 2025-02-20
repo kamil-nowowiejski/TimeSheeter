@@ -1,4 +1,4 @@
-import { WorkDay, WorkTimestamp } from "../common/models";
+import { WorkDay, WorkTimestamp } from "../common/models.ts";
 
 export default class WorkDaysApi {
 

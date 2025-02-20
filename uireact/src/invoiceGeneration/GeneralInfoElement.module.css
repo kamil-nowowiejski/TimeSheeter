@@ -1,0 +1,29 @@
+.container{
+    display: flex;
+    flex-direction: column;
+    margin-top: 20px;
+}
+
+.inputField{
+    display: flex;
+    flex-direction: row;
+    margin: 5px 0 5px 2px
+}
+
+.inputField label{
+    display: inline-block;
+    min-width: 200px;
+
+}
+
+.inputField input{
+    display: inline-block;
+    min-width: 200px;
+
+}
+
+.extraInfo{
+    height: 100px;
+    min-width: 200px;
+}
+

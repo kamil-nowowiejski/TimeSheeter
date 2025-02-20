@@ -27,7 +27,7 @@ class TestFontsProvider implements FontsProvider {
     }
 
     async getFont(fileName: string) {
-        const content = await Deno.readFile(`./public/${fileName}`)
+        const content = await Deno.readFile(`../Server/wwwroot/fonts/${fileName}`)
         return this.arrayBufferToBase64(content)
     }
 
