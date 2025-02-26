@@ -234,6 +234,33 @@ export class Month {
         throw new Error('Year value is invalid: ' + year)
     }
 }
+
+export interface InvoiceTemplate {
+    titleTemplate: string
+    issuer: Company
+    buyer: Company
+    paymentMethod: string
+    placeOfIssue: string
+    bankAccount: string
+    bankName: string
+    extraInformation: string[]
+    invoiceItemTemplate: InvoiceItemTemplate
+}
+
+export interface InvoiceItemTemplate{
+    description: string
+    unit: string,
+    vatRate: number
+}
+
+export interface Company {
+    name: string
+    nip: string
+    street: string
+    city: string
+    postalCode: string
+}
+
 function timeInMinutesToString(workTimeMinutes: number): string {
     const workHours = Math.floor(workTimeMinutes / 60)
     const workMinutes = workTimeMinutes - workHours * 60

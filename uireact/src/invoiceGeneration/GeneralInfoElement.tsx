@@ -21,7 +21,7 @@ export default function GeneralInfoElement(props: GeneralInfoElementProps) {
 
             <div className={styles.inputField}>
                 <label>Date</label>
-                <input name={FormNames.DateOfIssue} type='date' defaultValue={props.info.date} />
+                <input name={FormNames.DateOfIssue} type='text' defaultValue={props.info.date} />
             </div>
 
             <div className={styles.inputField}>
@@ -31,7 +31,7 @@ export default function GeneralInfoElement(props: GeneralInfoElementProps) {
 
             <div className={styles.inputField}>
                 <label>Payment deadline</label>
-                <input name={FormNames.PaymentDeadline} type='date' defaultValue={props.info.paymentDeadline} />
+                <input name={FormNames.PaymentDeadline} type='text' defaultValue={props.info.paymentDeadline} />
             </div>
 
             <div className={styles.inputField}>

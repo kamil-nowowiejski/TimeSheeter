@@ -15,13 +15,6 @@ export enum FormNames{
     BuyerCity = 'buyerCity', 
     BuyerPostalCode = 'buyerPostalCode',
 
-    InvoiceItemDescription =  'invoiceItemDescription',
-    InvoiceItemUnit = 'invoiceItemUnit',
-    InvoiceItemAmount = 'invoiceItemAmount',
-    InvoiceItemNetPrice = 'invoiceItemNetPrice',
-    InvoiceItemVatRate = 'invoiceItemVatRate',
-
-
     MethodOfPayment = 'methodOfPayment',
     PaymentDeadline = 'paymentDeadline',
     BankAccount = 'bankAccount',

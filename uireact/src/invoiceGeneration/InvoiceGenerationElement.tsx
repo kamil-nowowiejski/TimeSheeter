@@ -1,6 +1,6 @@
-import { Earnings, Month } from '../common/models.ts'
+import { Earnings, InvoiceTemplate, Month } from '../common/models.ts'
 import MonthPicker from '../common/MonthPickerElement.tsx'
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import AmountCalculationModePicker, { AmountCalculationMode } from './ModeSelectorElement.tsx'
 import InvoiceDetails from './InvoiceDetailsElement.tsx'
 import { Company, InvoiceGeneralInformation, InvoiceItem } from './models.ts'
@@ -18,21 +18,32 @@ import GeneralInfoElement from './GeneralInfoElement.tsx'
 import WorkDaysApi from '../apis/workDaysApi.ts'
 import EarningsApi from '../apis/earningsApi.ts'
 import { WorkDay } from '../common/models.ts'
+import InvoiceTemplateApi from '../apis/invoiceTemplateApi.ts'
+import HumanizerApi from '../apis/humanizerApi.ts'
 
 export default function InvoiceGenerationElement() {
     const [month, setMonth] = useState<Month>(Month.current())
     const [mode, setMode] = useState<AmountCalculationMode>(AmountCalculationMode.overridenHours)
     const [initialData, setInitialData] = useState<InitialData>()
 
-    useEffect(async () => {
-        const workDaysPromise =  new WorkDaysApi().getWorkDays(month.getDate(1), month.getDate(-1))
-        const earningsPromise = new EarningsApi().get()
-        const values = await Promise.all([ workDaysPromise, earningsPromise ])
-        const workDays = values[0]
-        const earnings = values[1]
-        const invoiceItem = createInvoiceItem(workDays, earnings)
-        createInitialData(workDays)
-        setInitialData(createEmptyData())
+    const invoiceItems = useRef<InvoiceItem>([])
+    const passInvoiceItemsToParent = useCallback((items: InvoiceItem[]) => invoiceItems.current = items)
+
+    useEffect(() => {
+        async function fetchData() {
+            const workDaysPromise = new WorkDaysApi().getWorkDays(month.getDate(1), month.getDate(0))
+            const earningsPromise = new EarningsApi().get()
+            const invoiceTemplatePromise = new InvoiceTemplateApi().get()
+            const values = await Promise.all([workDaysPromise, earningsPromise, invoiceTemplatePromise])
+            const workDays = values[0]
+            const earnings = values[1]
+            const invoiceTemplate = values[2]
+            const invoiceItem = createInvoiceItem(workDays, earnings, invoiceTemplate)
+            const initialData = createInitialData(invoiceItem, invoiceTemplate, earnings)
+            setInitialData(initialData)
+        }
+
+        fetchData()
     }, [])
 
     if (initialData === undefined) {
@@ -45,7 +56,7 @@ export default function InvoiceGenerationElement() {
             onSubmit={(e: React.FormEvent<HTMLFormElement>) => {
                 e.preventDefault()
                 const formData = new FormData(e.target as HTMLFormElement)
-                generateInvoice(formData)
+                generateInvoice(formData, invoiceItems.current, initialData.currency)
             }}
         >
             <MonthPicker defaultValue={month} onInput={(month) => setMonth(month)} />
@@ -57,7 +68,10 @@ export default function InvoiceGenerationElement() {
                 buyer={initialData.buyer}
             />
 
-            <InvoiceItemsElement invoiceItems={initialData.invoiceItems} />
+            <InvoiceItemsElement
+                invoiceItems={initialData.invoiceItems}
+                passInvoiceItemsToParent={passInvoiceItemsToParent}
+            />
             <GeneralInfoElement info={initialData.generalInfo} />
 
             <button type='submit'>Generate Invoice</button>
@@ -68,7 +82,7 @@ export default function InvoiceGenerationElement() {
 function onModeSelected(mode: AmountCalculationMode) {
 }
 
-function generateInvoice(data: FormData) {
+async function generateInvoice(data: FormData, invoiceItems: InvoiceItem[], currency: string) {
     const issuerStreet = data.get(FormNames.IssuerStreet) as string
     const issuerCity = data.get(FormNames.IssuerCity) as string
     const issuerPostalCode = data.get(FormNames.IssuerPostalCode) as string
@@ -76,14 +90,6 @@ function generateInvoice(data: FormData) {
     const buyerStreet = data.get(FormNames.BuyerStreet) as string
     const buyerCity = data.get(FormNames.BuyerCity) as string
     const buyerPostalCode = data.get(FormNames.BuyerPostalCode) as string
-
-    const invoiceItem = new InvoiceItem(
-        data.get(FormNames.InvoiceItemDescription) as string,
-        data.get(FormNames.InvoiceItemUnit) as string,
-        Number.parseInt(data.get(FormNames.InvoiceItemAmount) as string),
-        Number.parseFloat(data.get(FormNames.InvoiceItemNetPrice) as string),
-        Number.parseFloat(data.get(FormNames.InvoiceItemVatRate) as string),
-    )
 
     const invoice: Invoice = {
         title: data.get(FormNames.InvoiceTitle) as string,
@@ -101,38 +107,39 @@ function generateInvoice(data: FormData) {
             address1: buyerStreet,
             address2: `${buyerPostalCode} ${buyerCity}`,
         },
-        items: toPdfInvoiceItems(invoiceItem),
-        aggregate: calculateAggregate(invoiceItem),
+        items: toPdfInvoiceItems(invoiceItems),
+        aggregate: await calculateAggregate(invoiceItems),
         methodOfPayment: data.get(FormNames.MethodOfPayment) as string,
         paymentDeadline: data.get(FormNames.PaymentDeadline) as string,
         bankAccount: data.get(FormNames.BankAccount) as string,
         bankName: data.get(FormNames.BankName) as string,
         extraInformation: (data.get(FormNames.ExtraInformation) as string).split('\n'),
-        currency: 'XDDDD',
+        currency: currency,
     }
     const fileName = invoice.title + '.pdf'
     generatePdfInvoice(invoice, fileName, new FontsProvider())
 
-    function calculateAggregate(item: InvoiceItem): InvoiceAggregate {
+    async function calculateAggregate(items: InvoiceItem[]): Promise<InvoiceAggregate> {
+        const grossValueInWords = await new HumanizerApi().get(items[0].grossValue)
         return {
-            netValue: item.netPrice,
-            vatRate: item.vatRate,
-            vatValue: item.vatValue,
-            grossValue: item.grossValue,
-            grossValueInWords: 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
+            netValue: items[0].netPrice,
+            vatRate: items[0].vatRate,
+            vatValue: items[0].vatValue,
+            grossValue: items[0].grossValue,
+            grossValueInWords: grossValueInWords + ' ' + currency,
         }
     }
-    function toPdfInvoiceItems(item: InvoiceItem): PdfInvoiceItem[] {
+    function toPdfInvoiceItems(items: InvoiceItem[]): PdfInvoiceItem[] {
         const pdfItem = {
             key: 1,
-            description: item.description,
-            unit: item.unit,
-            amount: item.amount,
-            netPrice: item.netPrice,
-            netValue: item.netPrice,
-            vatRate: item.vatRate,
-            vatValue: item.vatValue,
-            grossValue: item.grossValue,
+            description: items[0].description,
+            unit: items[0].unit,
+            amount: items[0].amount,
+            netPrice: items[0].netPrice,
+            netValue: items[0].netPrice,
+            vatRate: items[0].vatRate,
+            vatValue: items[0].vatValue,
+            grossValue: items[0].grossValue,
         }
         return [pdfItem]
     }
@@ -143,6 +150,7 @@ interface InitialData {
     buyer: Company
     invoiceItems: InvoiceItem[]
     generalInfo: InvoiceGeneralInformation
+    currency: string
 }
 
 class FontsProvider implements IFontsProvider {
@@ -154,10 +162,9 @@ class FontsProvider implements IFontsProvider {
         return this.getFont('arialbd.ttf')
     }
 
-    private async getFont(fileName: string): Promise<string>{
-
+    private async getFont(fileName: string): Promise<string> {
         const response = await fetch(`fonts/${fileName}`)
-        const bytes =  await response.bytes()
+        const bytes = await response.bytes()
         return this.arrayBufferToBase64(bytes)
     }
 
@@ -171,77 +178,107 @@ class FontsProvider implements IFontsProvider {
     }
 }
 
-function createInvoiceItem(workDays:WorkDay[], earnings: Earnings): InitialData {
-
+function createInvoiceItem(workDays: WorkDay[], earnings: Earnings, invoiceTemplate: InvoiceTemplate): InvoiceItem {
     //TODO implement modes
-    return new InvoiceItem()
-
-
+    const amount = workDays.length * 8
+    const netPrice = amount * earnings.earningsPerHour
+    return new InvoiceItem(
+        invoiceTemplate.invoiceItemTemplate.description,
+        invoiceTemplate.invoiceItemTemplate.unit,
+        amount,
+        netPrice,
+        invoiceTemplate.invoiceItemTemplate.vatRate,
+    )
 }
-function createEmptyData(): InitialData {
+
+function createInitialData(
+    invoiceItem: InvoiceItem,
+    invoiceTemplate: InvoiceTemplate,
+    earnings: Earnings,
+): InitialData {
+    const currentDate = new Date()
     return {
         issuer: {
             name: {
-                defaultValue: '',
+                defaultValue: invoiceTemplate.issuer.name,
                 formItemName: FormNames.IssuerName,
             },
 
             nip: {
-                defaultValue: '',
+                defaultValue: invoiceTemplate.issuer.nip,
                 formItemName: FormNames.IssuerNip,
             },
             street: {
-                defaultValue: '',
+                defaultValue: invoiceTemplate.issuer.street,
                 formItemName: FormNames.IssuerStreet,
             },
             postalCode: {
-                defaultValue: '',
+                defaultValue: invoiceTemplate.issuer.postalCode,
                 formItemName: FormNames.IssuerPostalCode,
             },
             city: {
-                defaultValue: '',
+                defaultValue: invoiceTemplate.issuer.city,
                 formItemName: FormNames.IssuerCity,
             },
         },
         buyer: {
             name: {
-                defaultValue: '',
+                defaultValue: invoiceTemplate.buyer.name,
                 formItemName: FormNames.BuyerName,
             },
 
             nip: {
-                defaultValue: '',
+                defaultValue: invoiceTemplate.buyer.nip,
                 formItemName: FormNames.BuyerNip,
             },
             street: {
-                defaultValue: '',
+                defaultValue: invoiceTemplate.buyer.street,
                 formItemName: FormNames.BuyerStreet,
             },
             postalCode: {
-                defaultValue: '',
+                defaultValue: invoiceTemplate.buyer.postalCode,
                 formItemName: FormNames.BuyerPostalCode,
             },
             city: {
-                defaultValue: '',
+                defaultValue: invoiceTemplate.buyer.city,
                 formItemName: FormNames.BuyerCity,
             },
         },
-        invoiceItems: [
-            new InvoiceItem('umow nr xd na swiadczenie uslug od dnia xx/xx/xx do dno xx/xx/xx', 'h', 168, 23520, 0.23),
-        ],
+        invoiceItems: [invoiceItem],
         generalInfo: {
-            title: 'dgdgd',
-            placeOfIssue: 'Wroclaw',
-            date: '',
-            paymentMethod: 'przelew',
-            paymentDeadline: '',
-            bankAccount: '00 0000 000 0000 0000 0000',
-            bankName: 'Bank naem',
-            extraInformation: [
-                'item 1',
-                'item 2',
-                'item 3',
-            ],
+            title: getInvoiceTitle(invoiceTemplate.titleTemplate, currentDate),
+            placeOfIssue: invoiceTemplate.placeOfIssue,
+            date: formatDate(currentDate),
+            paymentMethod: invoiceTemplate.paymentMethod,
+            paymentDeadline: getPaymentDeadline(currentDate),
+            bankAccount: invoiceTemplate.bankAccount,
+            bankName: invoiceTemplate.bankName,
+            extraInformation: invoiceTemplate.extraInformation,
         },
+        currency: earnings.currency,
     }
+}
+
+function getInvoiceTitle(titleTemplate: string, currentDate: Date) {
+    const month = addLeadingZeros(currentDate.getMonth() + 1, 2)
+    const invoiceNumber = `01/${month}/${currentDate.getFullYear()}`
+    return titleTemplate.replace('{number}', invoiceNumber)
+}
+
+function getPaymentDeadline(currentDate: Date) {
+    const deadline = currentDate
+    deadline.setDate(deadline.getDate() + 30)
+    return formatDate(deadline)
+}
+
+function formatDate(date: Date) {
+    const day = addLeadingZeros(date.getDate(), 2)
+    const month = addLeadingZeros(date.getMonth() + 1, 2)
+    return `${day}-${month}-${date.getFullYear()}`
+}
+
+function addLeadingZeros(num: number, size: number) {
+    let stringNumber = num.toString()
+    while (stringNumber.length < size) stringNumber = '0' + num
+    return stringNumber
 }

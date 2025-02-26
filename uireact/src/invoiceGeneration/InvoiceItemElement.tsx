@@ -4,11 +4,12 @@ import { useState } from 'react'
 interface InvoiceItemElementProps {
     index: number
     invoiceItem: InvoiceItem
+    passItemToParent: (index: number, item: InvoiceItem) => void
 }
 
 export default function InvoiceItemElement(props: InvoiceItemElementProps) {
     const [item, setItem] = useState<InvoiceItem>(props.invoiceItem)
-    console.log('render')
+    props.passItemToParent(props.index, item)
     return (
         <tr>
             <td>{props.index}</td>

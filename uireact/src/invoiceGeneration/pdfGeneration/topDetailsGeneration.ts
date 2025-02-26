@@ -3,7 +3,7 @@ import { ElementBoundingBox, InvoiceDocData } from './models/internal.ts'
 import { Invoice } from './models/input.ts'
 import { getTextSize } from './utils.ts'
 import { setDrawing, setFont } from './models/extensions.ts'
-import {  InvoiceTopDetailTemplate } from './models/templateDefintion.ts'
+import { InvoiceTopDetailTemplate } from './models/templateDefintion.ts'
 
 interface TopDetailsOptions {
     template: InvoiceTopDetailTemplate
@@ -49,7 +49,7 @@ export function generateTopDetails(
         docInfo,
         {
             template: docInfo.topDetails.buyer,
-            dataText: [invoice.buyer.name, invoice.buyer.nip, invoice.buyer.address1, invoice.buyer.address2],
+            dataText: [invoice.buyer.name, 'NIP: ' + invoice.buyer.nip, invoice.buyer.address1, invoice.buyer.address2],
             horizontalPlacement: 'right',
             y: issueDateRect.y + issueDateRect.height + separatorSpace,
             dataTextAlignment: 'left',
@@ -61,7 +61,12 @@ export function generateTopDetails(
         docInfo,
         {
             template: docInfo.topDetails.issuer,
-            dataText: [invoice.issuer.name, invoice.issuer.nip, invoice.issuer.address1, invoice.issuer.address2],
+            dataText: [
+                invoice.issuer.name,
+                'NIP: ' + invoice.issuer.nip,
+                invoice.issuer.address1,
+                invoice.issuer.address2,
+            ],
             horizontalPlacement: 'left',
             y: buyerRect.y,
             dataTextAlignment: 'left',

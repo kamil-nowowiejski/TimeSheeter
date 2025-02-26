@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Server.Api.Dtos;
 using Server.Database;
 
@@ -13,7 +14,12 @@ public class InvoiceTemplateController(TimeSheeterDbContext dbContext) : Control
     [HttpGet]
     public InvoiceTemplateDto Get()
     {
-        var invoiceTemplate = _dbContext.InvoiceTemplates.Single();
+        var invoiceTemplate = _dbContext.InvoiceTemplates
+            .Include(x => x.Issuer)
+            .Include(x => x.Buyer)
+            .Include(x => x.InvoiceTemplateItem)
+            .Single();
+
         return new InvoiceTemplateDto
         {
             Issuer = MapToDto(invoiceTemplate.Issuer),
@@ -23,7 +29,8 @@ public class InvoiceTemplateController(TimeSheeterDbContext dbContext) : Control
             BankAccount = invoiceTemplate.BankAccount,
             PlaceOfIssue = invoiceTemplate.PlaceOfIssue,
             PaymentMethod = invoiceTemplate.PaymentMethod,
-            ExtraInformation = [.. invoiceTemplate.ExtraInformation.Split("\n")]
+            ExtraInformation = [.. invoiceTemplate.ExtraInformation.Split("\n")],
+            InvoiceItemTemplate = MapToDto(invoiceTemplate.InvoiceTemplateItem!)
         };
     }
 
@@ -36,6 +43,16 @@ public class InvoiceTemplateController(TimeSheeterDbContext dbContext) : Control
             City = company.City,
             Nip = company.Nip,
             PostalCode = company.PostalCode
+        };
+    }
+
+    private static InvoiceItemTemplateDto MapToDto(InvoiceItemTemplate model)
+    {
+        return new InvoiceItemTemplateDto()
+        {
+            Unit = model.Unit,
+            Description = model.Description,
+            VatRate = model.VatRate
         };
     }
 }

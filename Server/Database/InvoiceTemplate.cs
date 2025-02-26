@@ -14,5 +14,6 @@ public class InvoiceTemplate
     public string BankAccount {get;set;}=null!;
     public string BankName{get;set;}=null!;
     public string ExtraInformation{get;set;}=null!;
+    public InvoiceItemTemplate? InvoiceTemplateItem {get; set;} = null!;
 }
 

@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Server.Database;
 
@@ -10,9 +11,11 @@ using Server.Database;
 namespace Server.Database.Migrations
 {
     [DbContext(typeof(TimeSheeterDbContext))]
-    partial class TimeSheeterDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250224101617_AddEarningsAndInvoiceTemplate")]
+    partial class AddEarningsAndInvoiceTemplate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.2");
@@ -66,28 +69,6 @@ namespace Server.Database.Migrations
                     b.ToTable("Earnings");
                 });
 
-            modelBuilder.Entity("Server.Database.InvoiceItemTemplate", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Unit")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<double>("VatRate")
-                        .HasColumnType("REAL");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("InvoiceItemTemplate");
-                });
-
             modelBuilder.Entity("Server.Database.InvoiceTemplate", b =>
                 {
                     b.Property<int>("Id")
@@ -109,9 +90,6 @@ namespace Server.Database.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<int?>("InvoiceTemplateItemId")
-                        .HasColumnType("INTEGER");
-
                     b.Property<int>("IssuerId")
                         .HasColumnType("INTEGER");
 
@@ -130,8 +108,6 @@ namespace Server.Database.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("BuyerId");
-
-                    b.HasIndex("InvoiceTemplateItemId");
 
                     b.HasIndex("IssuerId");
 
@@ -162,10 +138,6 @@ namespace Server.Database.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Server.Database.InvoiceItemTemplate", "InvoiceTemplateItem")
-                        .WithMany()
-                        .HasForeignKey("InvoiceTemplateItemId");
-
                     b.HasOne("Server.Database.Company", "Issuer")
                         .WithMany()
                         .HasForeignKey("IssuerId")
@@ -173,8 +145,6 @@ namespace Server.Database.Migrations
                         .IsRequired();
 
                     b.Navigation("Buyer");
-
-                    b.Navigation("InvoiceTemplateItem");
 
                     b.Navigation("Issuer");
                 });

@@ -6,6 +6,6 @@ export default class EarningsApi {
             .then(response => response.text())
             .then(json => JSON.parse(json))
 
-        return new Earnings(dto.earningsPerHours, dto.currency)
+        return new Earnings(dto.earningsPerHour, dto.currency)
     }
 }
