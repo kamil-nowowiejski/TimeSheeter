@@ -3,15 +3,4 @@
     flex-direction: column;
 }
 
-.title{
-    background-color: lightblue;
-    font-weight: bold;
-}
 
-.entrySection{
-    margin-top: 10px
-}
-.entryLabel{
-    display: inline-block;
-    min-width: 200px;
-}

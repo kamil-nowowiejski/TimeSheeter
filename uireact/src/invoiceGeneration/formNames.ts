@@ -20,10 +20,4 @@ export enum FormNames{
     BankAccount = 'bankAccount',
     BankName = 'bankName',
     ExtraInformation = 'extraInformation',
-
-
-
-
 }
-
-

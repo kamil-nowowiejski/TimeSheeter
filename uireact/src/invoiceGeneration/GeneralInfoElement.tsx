@@ -1,57 +1,66 @@
 import { FormNames } from './formNames.ts'
 import { InvoiceGeneralInformation } from './models.ts'
 import styles from './GeneralInfoElement.module.css'
+import InvoiceItemEntry, { InvoiceDetailEntryProps } from './InvoiceDetailEntryElement.tsx'
 
 interface GeneralInfoElementProps {
     info: InvoiceGeneralInformation
 }
 
 export default function GeneralInfoElement(props: GeneralInfoElementProps) {
+    const entries: InvoiceDetailEntryProps[] = createEntries(props)
+
     return (
         <div className={styles.container}>
-            <div className={styles.inputField}>
-                <label>Title</label>
-                <input name={FormNames.InvoiceTitle} type='text' defaultValue={props.info.title} />
-            </div>
-
-            <div className={styles.inputField}>
-                <label>Place of issue</label>
-                <input name={FormNames.PlaceOfIssue} type='text' defaultValue={props.info.placeOfIssue} />
-            </div>
-
-            <div className={styles.inputField}>
-                <label>Date</label>
-                <input name={FormNames.DateOfIssue} type='text' defaultValue={props.info.date} />
-            </div>
-
-            <div className={styles.inputField}>
-                <label>Payment method</label>
-                <input name={FormNames.MethodOfPayment} type='text' defaultValue={props.info.paymentMethod} />
-            </div>
-
-            <div className={styles.inputField}>
-                <label>Payment deadline</label>
-                <input name={FormNames.PaymentDeadline} type='text' defaultValue={props.info.paymentDeadline} />
-            </div>
-
-            <div className={styles.inputField}>
-                <label>Bank account</label>
-                <input name={FormNames.BankAccount} type='text' defaultValue={props.info.bankAccount} />
-            </div>
-
-            <div className={styles.inputField}>
-                <label>Bank name</label>
-                <input name={FormNames.BankName} type='text' defaultValue={props.info.bankName} />
-            </div>
-
-            <div className={styles.inputField}>
-                <label>Extra information</label>
-                <textarea
-                    className={styles.extraInfo}
-                    name={FormNames.ExtraInformation}
-                    defaultValue={props.info.extraInformation.join('\n')}
-                />
-            </div>
+            {entries.map((e) => <InvoiceItemEntry key={e.label} {...e} />)}
         </div>
     )
+}
+
+function createEntries(props: GeneralInfoElementProps): InvoiceDetailEntryProps[] {
+    return [
+        {
+            label: "Title",
+            defaultValue: props.info.title,
+            formItemName: FormNames.InvoiceTitle
+        },
+        {
+            label: "Place of issue",
+            defaultValue: props.info.placeOfIssue,
+            formItemName: FormNames.PlaceOfIssue
+        },
+        {
+            label: "Date of issue",
+            defaultValue: props.info.date,
+            formItemName: FormNames.DateOfIssue
+        },
+        {
+            label: "Method of payment",
+            defaultValue: props.info.paymentMethod,
+            formItemName: FormNames.MethodOfPayment
+        },
+        {
+            label: "Payment deadline",
+            defaultValue: props.info.paymentDeadline,
+            formItemName: FormNames.PaymentDeadline
+        },
+        {
+            label: "Bank account",
+            defaultValue: props.info.bankAccount,
+            formItemName: FormNames.BankAccount
+        },
+        {
+            label: "Bank name",
+            defaultValue: props.info.bankName,
+            formItemName: FormNames.BankName,
+            useMultiLine: true
+        },
+        {
+            label: "Extra information",
+            defaultValue: props.info.extraInformation,
+            formItemName: FormNames.ExtraInformation,
+            useMultiLine: true,
+            isOptional: true
+        }
+    ]
 }

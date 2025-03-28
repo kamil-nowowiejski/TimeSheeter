@@ -31,7 +31,7 @@ function getCurrentTab(selectedTab: tabs) {
     switch (selectedTab) {
         case tabs.currentWeek: return <CurrentWeek />
         case tabs.timeSheetHistory: return <TimeSheetHistory />
-        case tabs.invoiceGenerator: return <InvoiceGeneration/>
+        case tabs.invoiceGenerator: return <InvoiceGeneration />
         default: break;
     }
 }

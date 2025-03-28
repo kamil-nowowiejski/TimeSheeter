@@ -1,0 +1,8 @@
+@use '../_sharedStyles.scss';
+
+.title {
+    background-color: sharedStyles.$colorX;
+    font-weight: bold;
+    padding: 10px;
+    font-size: 1.2em;
+}
