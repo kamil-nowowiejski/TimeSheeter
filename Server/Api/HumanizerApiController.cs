@@ -9,7 +9,7 @@ public class HumanizerController() : ControllerBase
 {
 
     [HttpGet]
-    public string Get(double number)
+    public string Get(decimal number)
     {
         var integer = (int)number;
         var fraction = (int)( ( number - integer )*100 );
