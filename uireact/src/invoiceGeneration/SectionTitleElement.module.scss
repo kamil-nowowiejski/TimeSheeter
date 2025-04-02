@@ -1,8 +1,10 @@
 @use '../_sharedStyles.scss';
 
 .title {
-    background-color: sharedStyles.$colorX;
+    background-color: rgba(sharedStyles.$accentColor, .7);
     font-weight: bold;
     padding: 10px;
     font-size: 1.2em;
+    border-top-right-radius: 5px;
+    border-top-left-radius: 5px;
 }

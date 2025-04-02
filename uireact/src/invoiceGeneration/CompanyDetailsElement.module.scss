@@ -1,0 +1,18 @@
+@use '../_sharedStyles.scss';
+
+.companyContainer{
+    display: flex;
+    flex-direction: column;
+}
+
+.companyBorder {
+    border: solid;
+    border-top: none;
+    border-width: 3px;
+    border-color: rgba(sharedStyles.$accentColor, .7);
+    padding: 10px;
+    border-bottom-right-radius: 5px;
+    border-bottom-left-radius: 5px;
+}
+
+

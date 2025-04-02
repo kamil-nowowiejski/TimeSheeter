@@ -9,11 +9,15 @@ export interface InvoiceDetailEntryProps {
     useMultiLine?: boolean
     labelWidth?: number;
     inputWidth?: number;
+    marginTop?: number;
+    marginBottom?: number;
 }
 
+
 export default function InvoiceDetailEntryElement(props: InvoiceDetailEntryProps) {
+    const containerStyle = createContainerStyle(props)
     return (
-        <div className={styles.entryContainer}>
+        <div className={styles.entryContainer} style={containerStyle}>
             <label className={styles.entryLabel} style={{minWidth: props.labelWidth}}>
                 {props.label}
             </label>
@@ -67,4 +71,15 @@ function breakLines(value: string | string[])  {
        return value; 
 
     return value.join("\n")
+}
+
+function createContainerStyle(props: InvoiceDetailEntryProps): any {
+    const style = {} as any
+    if(props.marginTop !== undefined)
+        style.marginTop = props.marginTop
+
+    if(props.marginBottom !== undefined)
+        style.marginBottom = props.marginBottom
+
+    return style
 }

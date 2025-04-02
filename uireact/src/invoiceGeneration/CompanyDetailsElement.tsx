@@ -1,4 +1,4 @@
-import styles from './CompanyDetailsElement.module.css'
+import styles from './CompanyDetailsElement.module.scss'
 import { Company } from './models.ts'
 import InvoiceDetailEntry, { InvoiceDetailEntryProps } from './InvoiceDetailEntryElement.tsx'
 import SectionTitle from './SectionTitleElement.tsx'
@@ -12,7 +12,9 @@ export default function CompanyDetails(props: CompanyDetailsElementProps) {
     return (
         <div className={styles.companyContainer}>
             <SectionTitle title={props.title}/>
-            {createEntries(props).map((e) => ( <InvoiceDetailEntry {...e}/>))}
+            <div className={styles.companyBorder}>
+                {createEntries(props).map((e) => ( <InvoiceDetailEntry {...e}/>))}
+            </div>
         </div>
     )
 }
@@ -23,6 +25,8 @@ function createEntries(props: CompanyDetailsElementProps): InvoiceDetailEntryPro
             label: 'Name:',
             defaultValue: props.company.name.defaultValue,
             formItemName: props.company.name.formItemName,
+            marginTop: 0
+
         },
         {
             label: 'NIP:',
@@ -42,7 +46,8 @@ function createEntries(props: CompanyDetailsElementProps): InvoiceDetailEntryPro
         {
             label: 'Postal code: ',
             defaultValue: props.company.postalCode.defaultValue,
-            formItemName: props.company.postalCode.formItemName
+            formItemName: props.company.postalCode.formItemName,
+            marginBottom: 0
         },
     ]
 }
