@@ -3,7 +3,7 @@ import styles from './App.module.css'
 import CurrentWeek from './currentWeek/CurrentWeekElement.tsx'
 import { SideMenu } from './sideMenu/SideMenu.tsx'
 import TimeSheetHistory from './history/TimeSheetHistoryElement.tsx'
-import InvoiceGeneration from './invoiceGeneration/InvoiceGenerationElement.tsx'
+import InvoiceGenerator from './invoiceGeneration/InvoiceGenerator.tsx'
 enum tabs {
     currentWeek,
     timeSheetHistory,
@@ -31,7 +31,7 @@ function getCurrentTab(selectedTab: tabs) {
     switch (selectedTab) {
         case tabs.currentWeek: return <CurrentWeek />
         case tabs.timeSheetHistory: return <TimeSheetHistory />
-        case tabs.invoiceGenerator: return <InvoiceGeneration />
+        case tabs.invoiceGenerator: return <InvoiceGenerator />
         default: break;
     }
 }

@@ -1,0 +1,44 @@
+$fontSize: 1.0em;
+$inputPadding: 0.4em;
+
+@mixin textInput {
+    min-height: 30px;
+    padding: 0 $inputPadding 0 $inputPadding;
+    font-size: $fontSize;
+    border-style: ridge;
+    border-color: #286880; //TODO: use predefined color
+    border-radius: 5px;
+    border-width: 1px;
+    flex-grow: 1;
+}
+
+.entryContainer {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-top: 15px;
+    margin-bottom: 15px;
+    margin-right: 15px;
+}
+
+.entryLabel {
+    min-width: 30%;
+    max-width: 30%;
+    overflow-wrap: break-word;
+    font-size: $fontSize;
+    align-items: flex-start;
+}
+
+.entryInput {
+    @include textInput;
+}
+
+.entryTextArea {
+    @include textInput;
+    font: inherit;
+    font-size: $fontSize;
+    padding: $inputPadding;
+    resize: none;
+    height: auto;
+    max-height: 400px;
+}

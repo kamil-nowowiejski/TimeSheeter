@@ -1,24 +1,21 @@
-import styles from './InvoiceDetailEntryElement.module.css'
+import styles from './Entry.module.scss'
 import { KeyboardEvent } from 'react'
 
-export interface InvoiceDetailEntryProps {
+export interface EntryProps {
     label: string
     defaultValue: string | string[]
     formItemName: string
     isOptional?: boolean
     useMultiLine?: boolean
-    labelWidth?: number;
-    inputWidth?: number;
     marginTop?: number;
     marginBottom?: number;
 }
 
 
-export default function InvoiceDetailEntryElement(props: InvoiceDetailEntryProps) {
-    const containerStyle = createContainerStyle(props)
+export default function Entry(props: EntryProps) {
     return (
-        <div className={styles.entryContainer} style={containerStyle}>
-            <label className={styles.entryLabel} style={{minWidth: props.labelWidth}}>
+        <div className={styles.entryContainer} style={{marginTop: props.marginTop, marginBottom: props.marginBottom}}>
+            <label className={styles.entryLabel}>
                 {props.label}
             </label>
             {props.useMultiLine ? createHtmlTextArea(props) : createHtmlInput(props)}
@@ -26,7 +23,7 @@ export default function InvoiceDetailEntryElement(props: InvoiceDetailEntryProps
     )
 }
 
-function createHtmlInput(props: InvoiceDetailEntryProps) {
+function createHtmlInput(props: EntryProps) {
     return (
         <input
             className={styles.entryInput}
@@ -34,22 +31,20 @@ function createHtmlInput(props: InvoiceDetailEntryProps) {
             type='text'
             defaultValue={props.defaultValue}
             name={props.formItemName}
-            style={{minWidth: props.inputWidth}}
         />
     )
 }
 
-function createHtmlTextArea(props: InvoiceDetailEntryProps) {
+function createHtmlTextArea(props: EntryProps) {
     const defaultValue = breakLines(props.defaultValue)
 
     return (
         <textarea
-            className={`${styles.entryTextArea} ${styles.entryInput}`}
+            className={styles.entryTextArea}
             required={props.isOptional === false}
             defaultValue={defaultValue}
             name={props.formItemName}
             rows={getNumerOfRows(defaultValue)}
-            style={{minWidth: props.inputWidth}}
             onKeyUp={autoResizeTextArea}
         />
     )
@@ -71,15 +66,4 @@ function breakLines(value: string | string[])  {
        return value; 
 
     return value.join("\n")
-}
-
-function createContainerStyle(props: InvoiceDetailEntryProps): any {
-    const style = {} as any
-    if(props.marginTop !== undefined)
-        style.marginTop = props.marginTop
-
-    if(props.marginBottom !== undefined)
-        style.marginBottom = props.marginBottom
-
-    return style
 }

@@ -1,8 +1,9 @@
+import styles from './InvoiceGenerator.module.css'
 import { Earnings, InvoiceTemplate, Month } from '../common/models.ts'
 import MonthPicker from '../common/MonthPickerElement.tsx'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import AmountCalculationModePicker, { AmountCalculationMode } from './ModeSelectorElement.tsx'
-import InvoiceDetails from './InvoiceDetailsElement.tsx'
+import { InvoiceDetails } from './invoiceDetails/index.ts'
 import { Company, InvoiceGeneralInformation, InvoiceItem } from './models.ts'
 import {
     Company as PdfCompany,
@@ -14,7 +15,6 @@ import {
 import { InvoiceAggregate } from './pdfGeneration/models/input.ts'
 import { FormNames } from './formNames.ts'
 import InvoiceItemsElement from './InvoiceItemsElement.tsx'
-import GeneralInfoElement from './GeneralInfoElement.tsx'
 import WorkDaysApi from '../apis/workDaysApi.ts'
 import EarningsApi from '../apis/earningsApi.ts'
 import { WorkDay } from '../common/models.ts'
@@ -58,21 +58,21 @@ export default function InvoiceGenerationElement() {
                 const formData = new FormData(e.target as HTMLFormElement)
                 generateInvoice(formData, invoiceItems.current, initialData.currency)
             }}
+            className={styles.masterContainer}
         >
             <MonthPicker defaultValue={month} onInput={(month) => setMonth(month)} />
 
             <AmountCalculationModePicker mode={mode} onInput={onModeSelected} />
             <InvoiceDetails
-                amountCalculationMode={mode}
                 issuer={initialData.issuer}
                 buyer={initialData.buyer}
+                info={initialData.generalInfo}
             />
 
             <InvoiceItemsElement
                 invoiceItems={initialData.invoiceItems}
                 passInvoiceItemsToParent={passInvoiceItemsToParent}
             />
-            <GeneralInfoElement info={initialData.generalInfo} />
 
             <button type='submit'>Generate Invoice</button>
         </form>
