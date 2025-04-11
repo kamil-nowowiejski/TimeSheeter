@@ -14,7 +14,7 @@ import {
 } from './pdfGeneration/main.ts'
 import { InvoiceAggregate } from './pdfGeneration/models/input.ts'
 import { FormNames } from './formNames.ts'
-import InvoiceItemsElement from './InvoiceItemsElement.tsx'
+import { InvoiceItems } from './invoiceItems/index.ts'
 import WorkDaysApi from '../apis/workDaysApi.ts'
 import EarningsApi from '../apis/earningsApi.ts'
 import { WorkDay } from '../common/models.ts'
@@ -26,7 +26,7 @@ export default function InvoiceGenerationElement() {
     const [mode, setMode] = useState<AmountCalculationMode>(AmountCalculationMode.overridenHours)
     const [initialData, setInitialData] = useState<InitialData>()
 
-    const invoiceItems = useRef<InvoiceItem>([])
+    const invoiceItems = useRef<InvoiceItem[]>([])
     const passInvoiceItemsToParent = useCallback((items: InvoiceItem[]) => invoiceItems.current = items)
 
     useEffect(() => {
@@ -57,9 +57,7 @@ export default function InvoiceGenerationElement() {
                 e.preventDefault()
                 const formData = new FormData(e.target as HTMLFormElement)
                 generateInvoice(formData, invoiceItems.current, initialData.currency)
-            }}
-            className={styles.masterContainer}
-        >
+            }} >
             <MonthPicker defaultValue={month} onInput={(month) => setMonth(month)} />
 
             <AmountCalculationModePicker mode={mode} onInput={onModeSelected} />
@@ -69,7 +67,7 @@ export default function InvoiceGenerationElement() {
                 info={initialData.generalInfo}
             />
 
-            <InvoiceItemsElement
+            <InvoiceItems
                 invoiceItems={initialData.invoiceItems}
                 passInvoiceItemsToParent={passInvoiceItemsToParent}
             />

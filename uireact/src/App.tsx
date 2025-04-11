@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import styles from './App.module.css'
+import styles from './App.module.scss'
 import CurrentWeek from './currentWeek/CurrentWeekElement.tsx'
 import { SideMenu } from './sideMenu/SideMenu.tsx'
 import TimeSheetHistory from './history/TimeSheetHistoryElement.tsx'
@@ -15,7 +15,7 @@ export default function App() {
     const [selectedTab, setSelectedTab] = useState(tabs.invoiceGenerator)
 
     return (
-        <div className={styles.flexRow}>
+        <div className={styles.masterContainer}>
             <SideMenu
                 selectCurrentWeek={() => setSelectedTab(tabs.currentWeek)}
                 selectTimeSheetHistory={() => setSelectedTab(tabs.timeSheetHistory)}

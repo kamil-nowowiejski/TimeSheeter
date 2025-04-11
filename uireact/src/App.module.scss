@@ -1,3 +1,5 @@
+@use './_sharedStyles';
+
 html {
     font-family: Arial, Helvetica, sans-serif;
 }
@@ -6,17 +8,23 @@ body {
     background-color: lightCyan;
     margin: 0;
 }
-.flexRow {
+.masterContainer {
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;
-    width: 100%;
+    min-width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
     height: 100%;
 }
 
 .contentContainer {
-    flex: 1;
+    flex-shrink: 1;
     margin-top: 8px;
     margin-left: 8px;
+    padding-right: 40px;
+    overflow-x: hidden;
+    width: calc(100vw - sharedStyles.$sideMenuMaxSize);
+
 }
 

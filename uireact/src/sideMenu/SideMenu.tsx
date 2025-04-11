@@ -1,4 +1,4 @@
-import './SideMenu.css'
+import styles from './SideMenu.module.scss'
 
 export interface SideMenuProps {
     selectCurrentWeek: () => void;
@@ -8,18 +8,18 @@ export interface SideMenuProps {
 
 export function SideMenu(props: SideMenuProps) {
     return (
-        <div className="side-menu">
-            <button type="button" className="menu-item current-week" onClick={props.selectCurrentWeek}>
-                <i className="fa-solid fa-calendar-week fa-lg icon-style"></i>
+        <div className={styles.sideMenu}>
+            <button type="button" className={styles.menuItem} onClick={props.selectCurrentWeek}>
+                <i className={`fa-solid fa-calendar-week fa-lg ${styles.icon}`}></i>
                 Current Week
             </button>
 
-            <button type="button" className="menu-item time-sheet-history" onClick={props.selectTimeSheetHistory}>
-                <i className="fa-solid fa-clock-rotate-left fa-lg icon-style"></i>
+            <button type="button" className={styles.menuItem} onClick={props.selectTimeSheetHistory}>
+                <i className={`fa-solid fa-clock-rotate-left fa-lg ${styles.icon}`}></i>
                 Timesheet History
             </button>
-            <button type='button' className='menu-item invoice-generator' onClick={props.selectInvoiceGenerator}>
-                <i className='fa-solid fa-dollar-sign fa-lg icon-style'></i>
+            <button type='button' className={styles.menuItem} onClick={props.selectInvoiceGenerator}>
+                <i className={`fa-solid fa-dollar-sign fa-lg ${styles.icon}`}></i>
                 Generate Invoice
             </button>
         </div>

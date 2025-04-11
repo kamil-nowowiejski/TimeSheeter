@@ -3,5 +3,6 @@
     margin-top: 20px;
     row-gap: 20px;
     column-gap: 30px;
-    justify-items: stretch;
+    max-width: 100%;
+    overflow-x: hidden;
 }

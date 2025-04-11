@@ -1,15 +1,18 @@
-.side-menu {
-    height: 100vh; 
-    flex-grow: 0;
+@use '../_sharedStyles';
+
+.sideMenu {
+    flex-grow: 1;
     flex-shrink: 0;
-    flex-basis: 250px;
+    flex-basis: sharedStyles.$sideMenuMaxSize;
+    max-width: sharedStyles.$sideMenuMaxSize;
+    min-height: 100vh;
     background-image: linear-gradient(to left, lightCyan, darkTurquoise);
     display: flex;
     flex-direction: column; 
     flex-wrap: nowrap;
 }
 
-.menu-item {
+.menuItem {
     border: single;
     border-radius: 5px;
     border-color: blue;  
@@ -17,9 +20,9 @@
     margin: 10px 40px 10px 10px; 
     background-color: paleTurquoise;
     text-wrap: nowrap;
-    font-size: 14px;
+    font-size: 14px; /*TODO: Use predefined font size*/
 }
 
-.icon-style {
-    color: #2572ad;
+.icon {
+    color: #2572ad;  /*TODO: Use predefined color*/
 }
