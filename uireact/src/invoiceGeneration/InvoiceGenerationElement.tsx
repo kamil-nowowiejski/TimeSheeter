@@ -186,7 +186,7 @@ function createInvoiceItem(workDays: WorkDay[], earnings: Earnings, invoiceTempl
     return new InvoiceItem(
         invoiceTemplate.invoiceItemTemplate.description,
         invoiceTemplate.invoiceItemTemplate.unit,
-        amount,
+        1,
         netPrice,
         invoiceTemplate.invoiceItemTemplate.vatRate,
     )
@@ -269,7 +269,7 @@ function getInvoiceTitle(titleTemplate: string, currentDate: Date) {
 
 function getPaymentDeadline(currentDate: Date) {
     const deadline = currentDate
-    deadline.setDate(deadline.getDate() + 30)
+    deadline.setDate(deadline.getDate() + 14)
     return formatDate(deadline)
 }
 

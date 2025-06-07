@@ -36,7 +36,8 @@ export class InvoiceItem {
     }
 
     public get vatValue() {
-        return this._netPrice * this._vatRate
+        const vatValue = this._netPrice * this._vatRate 
+        return Math.round((vatValue + Number.EPSILON) * 100) / 100
     }
 
     public get grossValue() {
