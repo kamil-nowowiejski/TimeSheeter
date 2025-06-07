@@ -2,6 +2,7 @@ export interface Invoice {
     title: string
     placeOfIssue: string
     dateOfIssue: string
+    finishDate: string
     issuer: Company
     buyer: Company
     items: InvoiceItem[]

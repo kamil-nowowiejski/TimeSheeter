@@ -81,7 +81,8 @@ interface ShallowInvoiceItem{
 export interface InvoiceGeneralInformation{
     title: string
     placeOfIssue: string
-    date: string
+    issueDate: string
+    finishDate: string
     paymentMethod: string
     paymentDeadline: string
     bankAccount: string

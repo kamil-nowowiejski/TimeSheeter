@@ -18,7 +18,8 @@ export function generateTopDetails(
     docInfo: InvoiceDocData,
     invoice: Invoice,
 ): ElementBoundingBox {
-    const separatorSpace = 5
+    const bigSeparatorSpace = 5
+    const smallSeparatorSpace = 1
 
     const issuePlaceRect = generateTopDetail(
         doc,
@@ -36,12 +37,24 @@ export function generateTopDetails(
         doc,
         docInfo,
         {
-            template: docInfo.topDetails.date,
+            template: docInfo.topDetails.issueDate,
             dataText: invoice.dateOfIssue,
             horizontalPlacement: 'right',
-            y: issuePlaceRect.y + issuePlaceRect.height + separatorSpace,
+            y: issuePlaceRect.y + issuePlaceRect.height + smallSeparatorSpace,
             dataTextAlignment: 'center',
         },
+    )
+
+    const finishDateRect = generateTopDetail(
+        doc,
+        docInfo,
+        {
+            template: docInfo.topDetails.finishDate,
+            dataText: invoice.finishDate,
+            horizontalPlacement: 'right',
+            y: issueDateRect.y + issueDateRect.height + smallSeparatorSpace,
+            dataTextAlignment: 'center'
+        }
     )
 
     const buyerRect = generateTopDetail(
@@ -51,7 +64,7 @@ export function generateTopDetails(
             template: docInfo.topDetails.buyer,
             dataText: [invoice.buyer.name, 'NIP: ' + invoice.buyer.nip, invoice.buyer.address1, invoice.buyer.address2],
             horizontalPlacement: 'right',
-            y: issueDateRect.y + issueDateRect.height + separatorSpace,
+            y: finishDateRect.y + finishDateRect.height + bigSeparatorSpace,
             dataTextAlignment: 'left',
         },
     )
@@ -77,7 +90,7 @@ export function generateTopDetails(
         x: issuerRect.x,
         y: issuePlaceRect.y,
         width: issuerRect.width + docInfo.topDetails.verticalSpace + buyerRect.width,
-        height: issuePlaceRect.height + issueDateRect.height + buyerRect.height + separatorSpace * 2,
+        height: issuePlaceRect.height + issueDateRect.height + finishDateRect.height + buyerRect.height + smallSeparatorSpace * 2 + bigSeparatorSpace,
     }
 }
 

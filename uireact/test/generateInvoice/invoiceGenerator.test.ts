@@ -1,7 +1,7 @@
 import { FontsProvider, generateInvoice, Invoice } from '../../src/invoiceGeneration/pdfGeneration/main.ts'
 
 Deno.test('generate example invoice', async () => {
-    const fileName = 'C:\\Users\\Nowowik\\Downloads\\test-invoice.pdf'
+    const fileName = 'C:\\Users\\qrp\\Downloads\\test-invoice.pdf'
     removeExistingTestInvoiceFile(fileName)
     const testInvoice = getTestInvoice()
     await generateInvoice(testInvoice, fileName, new TestFontsProvider())
@@ -59,6 +59,7 @@ function getTestInvoice(): Invoice {
         title: 'Faktura VAT 01/02/2024',
         placeOfIssue: 'Wrocław',
         dateOfIssue: '30-05-3333',
+        finishDate: '29-05-3433',
         issuer: {
             name: 'STEFAN BATORY COOL COMPANY',
             nip: '123456789',

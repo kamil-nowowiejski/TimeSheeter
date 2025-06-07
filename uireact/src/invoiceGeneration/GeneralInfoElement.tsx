@@ -20,8 +20,13 @@ export default function GeneralInfoElement(props: GeneralInfoElementProps) {
             </div>
 
             <div className={styles.inputField}>
-                <label>Date</label>
-                <input name={FormNames.DateOfIssue} type='text' defaultValue={props.info.date} />
+                <label>Issue date</label>
+                <input name={FormNames.DateOfIssue} type='text' defaultValue={props.info.issueDate} />
+            </div>
+
+            <div className={styles.inputField}>
+                <label>Finish date</label>
+                <input name={FormNames.FinishDate} type='text' defaultValue={props.info.finishDate} />
             </div>
 
             <div className={styles.inputField}>

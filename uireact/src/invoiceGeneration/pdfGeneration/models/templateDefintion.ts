@@ -31,8 +31,14 @@ export class InvoiceTemplate {
         }
 
         this._topDetails = {
-            date: {
+            issueDate: {
                 title: 'Data wystawienia',
+                headerFont: { name: 'arial', style: 'regular', size: 11 },
+                headerHeight: 6,
+                dataFont: { name: 'arial', style: 'bold', size: 11 },
+            },
+            finishDate: {
+                title: "Data zakończenia",
                 headerFont: { name: 'arial', style: 'regular', size: 11 },
                 headerHeight: 6,
                 dataFont: { name: 'arial', style: 'bold', size: 11 },
@@ -170,7 +176,8 @@ type FontStyle = 'regular' | 'bold'
 
 export interface InvoiceTopDetailsTemplate {
     place: InvoiceTopDetailTemplate
-    date: InvoiceTopDetailTemplate
+    issueDate: InvoiceTopDetailTemplate
+    finishDate: InvoiceTopDetailTemplate
     buyer: InvoiceTopDetailTemplate
     issuer: InvoiceTopDetailTemplate
     verticalSpace: number

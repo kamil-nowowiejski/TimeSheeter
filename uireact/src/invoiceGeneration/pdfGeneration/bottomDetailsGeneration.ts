@@ -29,22 +29,24 @@ function generateLeftDetails(
         { title: docInfo.bottomDetails.left.paymentDeadlineTitle, value: invoice.paymentDeadline },
         { title: docInfo.bottomDetails.left.bankAccountNumberTitle, value: [invoice.bankAccount] },
         { title: docInfo.bottomDetails.left.bankNameTitle, value: [invoice.bankName] },
-        { title: docInfo.bottomDetails.left.extraInfoTitle, value: invoice.extraInformation },
+        { title: docInfo.bottomDetails.left.extraInfoTitle, value: normalizeExtraInfo(invoice.extraInformation) },
     ]
 
     let elementStartY = sectionStartY
-    elements.forEach((element) => {
-        const elementBoundingBox = generateLeftDetail(
-            doc,
-            docInfo,
-            leftDetailsStartX,
-            elementStartY,
-            sectionWidth,
-            element.title,
-            element.value,
-        )
-        elementStartY += elementBoundingBox.height
-    })
+    elements
+        .filter(e => e.value !== '' && e.value !== undefined && e.value !== null)
+        .forEach((element) => {
+            const elementBoundingBox = generateLeftDetail(
+                doc,
+                docInfo,
+                leftDetailsStartX,
+                elementStartY,
+                sectionWidth,
+                element.title,
+                element.value,
+            )
+            elementStartY += elementBoundingBox.height
+        })
 
     return {
         x: leftDetailsStartX,
@@ -175,4 +177,10 @@ function generateRighDetails(
         baseline: 'top',
         align: 'left',
     })
+}
+
+function normalizeExtraInfo(extraInfo: string[]) {
+    const nonEmptyElementsCount = extraInfo.filter(e => e !== null && e !== undefined && e !== '').length
+    return nonEmptyElementsCount > 0 ? extraInfo : undefined
+
 }

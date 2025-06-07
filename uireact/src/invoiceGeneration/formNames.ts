@@ -2,6 +2,7 @@ export enum FormNames{
     InvoiceTitle = 'invoiceTitle',
     PlaceOfIssue = 'placeOfIssue',
     DateOfIssue = 'dateOfIssue',
+    FinishDate = 'finishDate',
 
     IssuerName = 'issuerName',
     IssuerNip = 'issuerNip',
@@ -20,10 +21,4 @@ export enum FormNames{
     BankAccount = 'bankAccount',
     BankName = 'bankName',
     ExtraInformation = 'extraInformation',
-
-
-
-
 }
-
-

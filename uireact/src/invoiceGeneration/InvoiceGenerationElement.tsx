@@ -95,6 +95,7 @@ async function generateInvoice(data: FormData, invoiceItems: InvoiceItem[], curr
         title: data.get(FormNames.InvoiceTitle) as string,
         placeOfIssue: data.get(FormNames.PlaceOfIssue) as string,
         dateOfIssue: data.get(FormNames.DateOfIssue) as string,
+        finishDate: data.get(FormNames.FinishDate) as string,
         issuer: {
             name: data.get(FormNames.IssuerName) as string,
             nip: data.get(FormNames.IssuerNip) as string,
@@ -248,7 +249,8 @@ function createInitialData(
         generalInfo: {
             title: getInvoiceTitle(invoiceTemplate.titleTemplate, currentDate),
             placeOfIssue: invoiceTemplate.placeOfIssue,
-            date: formatDate(currentDate),
+            issueDate: formatDate(currentDate),
+            finishDate: formatDate(currentDate),
             paymentMethod: invoiceTemplate.paymentMethod,
             paymentDeadline: getPaymentDeadline(currentDate),
             bankAccount: invoiceTemplate.bankAccount,
