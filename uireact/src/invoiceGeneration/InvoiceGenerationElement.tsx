@@ -181,7 +181,8 @@ class FontsProvider implements IFontsProvider {
 
 function createInvoiceItem(workDays: WorkDay[], earnings: Earnings, invoiceTemplate: InvoiceTemplate): InvoiceItem {
     //TODO implement modes
-    const amount = workDays.length * 8
+    const validWorkDays = workDays.filter(_ => _.startTime && _.finishTime && _.finishTime > _.startTime)
+    const amount = validWorkDays.length * 8
     const netPrice = amount * earnings.earningsPerHour
     return new InvoiceItem(
         invoiceTemplate.invoiceItemTemplate.description,

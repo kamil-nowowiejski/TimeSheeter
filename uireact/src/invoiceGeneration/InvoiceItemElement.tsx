@@ -31,11 +31,11 @@ export default function InvoiceItemElement(props: InvoiceItemElementProps) {
             </td>
 
             <td>
-                <input type='number' defaultValue={item.netPrice} onInput={(e) => onNetPriceChange(e, item, setItem)} />
+                <input type='number' step="0.01" defaultValue={item.netPrice} onInput={(e) => onNetPriceChange(e, item, setItem)} />
             </td>
 
             <td>
-                <input type='number' defaultValue={item.vatRate} onInput={(e) => onVatRateChange(e, item, setItem)} />
+                <input type='number' step="0.01" defaultValue={item.vatRate} onInput={(e) => onVatRateChange(e, item, setItem)} />
             </td>
 
             <td>{item.vatValue}</td>
